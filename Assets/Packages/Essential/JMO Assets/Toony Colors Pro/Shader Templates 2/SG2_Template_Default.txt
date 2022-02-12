@@ -1,5 +1,5 @@
 // Toony Colors Pro+Mobile 2
-// (c) 2014-2020 Jean Moreno
+// (c) 2014-2021 Jean Moreno
 
 #NAME=Default
 #ID=TEMPLATE_DEFAULT
@@ -11,6 +11,7 @@
 
 # needed by Shader Generator 2:
 NoTile Sampling
+Triplanar Sampling
 HSV
 Screen Space UV
 Hash Functions
@@ -30,6 +31,7 @@ AlbedoHSV
 Normal Mapping
 Texture Blending
 Triplanar
+Vertex Displacement
 
 # stylization:
 NdotL Stylization
@@ -40,9 +42,11 @@ Outline
 Dissolve
 Vertical Fog
 Wind
+Water
 VertExmotion
 CurvedWorld
 Aura2
+Depth Texture
 
 #END
 
@@ -55,8 +59,10 @@ dd_start	lbl="LIGHTING"
 ---
 [[MODULE:FEATURES:Ramp Shading]]
 #sngl	lbl="Bypass Additional Lights Falloff"		kw=BYPASS_LIGHT_FALLOFF								tt="Bypass the point and spot light falloff calculation and only use the TCP2 ramp shading instead"
+---
 mult	lbl="Shadow Color Mode"			kw=Multiply|,Replace Color|SHADOW_COLOR_LERP					tt="How to blend the shadow color on the model"		help="featuresreference/lighting/shadowcolormode"
 [[MODULE:FEATURES:ShadowHSV]]
+sngl	lbl="Apply Shadows before Ramp"		kw=ATTEN_AT_NDL												tt="Apply the shadow map attenuation before calculating the shading ramp"	help="featuresreference/lighting/applyshadowsbeforeramp"
 ---
 [[MODULE:FEATURES:Specular]]
 ---
@@ -66,14 +72,15 @@ sngl	lbl="Emission"					kw=EMISSION		help="featuresreference/lighting/emission"	
 ---
 [[MODULE:FEATURES:Subsurface Scattering]]
 ---
-sngl	lbl="Reflection Probes"			kw=GLOSSY_REFLECTIONS																	tt="Enable reflection probes or skybox reflection support"
+subh	lbl="Reflections"		help="featuresreference/lighting/reflections"
+sngl	lbl="Reflection Probes"			kw=GLOSSY_REFLECTIONS																					tt="Enable reflection probes or skybox reflection support"
 [[MODULE:FEATURES:Reflection]]
-sngl	lbl="Make Reflections Optional"	kw=REFLECTION_SHADER_FEATURE		needsOr=REFLECTION_CUBEMAP,GLOSSY_REFLECTIONS		tt="Will make reflections optional in the material inspector, using a shader keyword"
+sngl	lbl="Make Reflections Optional"	kw=REFLECTION_SHADER_FEATURE		needsOr=REFLECTION_CUBEMAP,GLOSSY_REFLECTIONS,PLANAR_REFLECTION		tt="Will make reflections optional in the material inspector, using a shader keyword"
 ---
 [[MODULE:FEATURES:MatCap]]
 ---
 subh	lbl="Ambient Lighting/Indirect Diffuse"		help="featuresreference/lighting/ambientlighting/indirectdiffuse"
-flag	lbl="Disable Ambient Lighting"	kw=noambient		tt="Disable ambient lighting calculated by the engine (as defined in the Lighting Settings)"
+flag	lbl="Disable Ambient Lighting"	kw=noambient	block="pragma_surface_shader"	tt="Disable ambient lighting calculated by the engine (as defined in the Lighting Settings)"
 [[MODULE:FEATURES:Custom Ambient]]
 sngl	lbl="Occlusion"					kw=OCCLUSION		tt="Adds ambient lighting occlusion support.  Modify the Occlusion property to change the source input (texture, vertex color, etc.)."
 sngl	lbl="Make Ambient Optional"		kw=AMBIENT_SHADER_FEATURE	tt="Will make ambient/indirect diffuse lighting optional in the material inspector, using a shader keyword"
@@ -82,9 +89,12 @@ dd_end
 
 dd_start	lbl="SURFACE"
 ---
+[[MODULE:FEATURES:Vertex Displacement]]
+---
 [[MODULE:FEATURES:AlbedoHSV]]
 ---
 [[MODULE:FEATURES:Normal Mapping]]
+sngl	lbl="Sample Normal Map first"	kw=WORLD_NORMAL_FROM_BUMP		needs=BUMP	indent		tt="Sample the Normal Map before other Shader Properties, so that the ones using the 'World Normal' value will use the normal mapped version"
 ---
 [[MODULE:FEATURES:Texture Blending]]
 ---
@@ -98,7 +108,9 @@ dd_start	lbl="STYLIZATION"
 dd_end
 dd_start	lbl="SPECIAL EFFECTS"
 ---
-sngl	lbl="Silhouette Pass"			kw=PASS_SILHOUETTE										tt="Adds a silhouette pass, to show the object when it is behind obstacles"
+sngl	lbl="Custom Time"				kw=CUSTOM_TIME		help="featuresreference/specialeffects/customtime"		tt="Use a custom time variable controlled by scripts for all timed-related features (this will disable Editor animation preview).  The custom time variable is a float4 named '_CustomTime'.  By default, the Y component should reflect the actual time, and other components are multiples of that value:  x: time * 0.05  y: time  z: time * 2  w: time * 3"
+---
+sngl	lbl="Silhouette Pass"			kw=PASS_SILHOUETTE		help="featuresreference/specialeffects/silhouettepass"		tt="Adds a silhouette pass, to show the object when it is behind obstacles"
 sngl	lbl="Stencil Mask"				kw=SILHOUETTE_STENCIL	needs=PASS_SILHOUETTE	indent	tt="Use the Stencil Buffer as a mask for the silhouette, to prevent transparency issues with non-convex meshes or multiple meshes"
 ---
 [[MODULE:FEATURES:Wind]]
@@ -106,30 +118,36 @@ sngl	lbl="Stencil Mask"				kw=SILHOUETTE_STENCIL	needs=PASS_SILHOUETTE	indent	tt
 [[MODULE:FEATURES:Dissolve]]
 ---
 [[MODULE:FEATURES:Vertical Fog]]
+---
+[[MODULE:FEATURES:Water]]
 dd_end
 dd_start	lbl="TRANSPARENCY/BLENDING"
 ---
-mult	lbl="Blending"				kw=Off|,Alpha Blending|ALPHA_BLENDING,Alpha Blending Premultiplied|ALPHA_BLENDING_PREMULT,Additive|ADDITIVE_BLENDING,Multiplicative|MULTIPLICATIVE_BLENDING,Custom Blending|CUSTOM_BLENDING	toggles=SHADER_BLENDING		tt="Enable blending on the shader"
-sngl		lbl="Dithered Shadows"	kw=DITHERED_SHADOWS		needs=CUSTOM_BLENDING		indent		tt="Enables dithered shadows for transparent materials"
-mult_fs		lbl="Blend Operation"		kw=BLEND_OP		options=Default|,Custom|Constant,Material Property|Material Property		shader_property="Blend Operation"		tt="Enable blend operation control"
+sngl	lbl="Auto Optional Transparency"	kw=AUTO_TRANSPARENT_BLENDING	help="featuresreference/transparency/blending/autooptionaltransparency"		tt="Automatically handle transparency and add rendering mode options in the material inspector (opaque, transparent, fade), similar to how it is handled in the Hybrid Shader"
+---
+mult	lbl="Blending"			excl=AUTO_TRANSPARENT_BLENDING		kw=Off|,Alpha Blending|ALPHA_BLENDING,Alpha Blending Premultiplied|ALPHA_BLENDING_PREMULT,Additive|ADDITIVE_BLENDING,Multiplicative|MULTIPLICATIVE_BLENDING,Custom Blending|CUSTOM_BLENDING	toggles=SHADER_BLENDING		tt="Enable blending on the shader"	help="featuresreference/transparency/blending/blending/blendoperation"
+sngl		lbl="Dithered Shadows"	kw=DITHERED_SHADOWS		needs=SHADER_BLENDING		indent		tt="Enables dithered shadows for transparent materials"
+mult_fs		lbl="Blend Operation"		kw=BLEND_OP		options=Default|,Custom|Constant,Material Property|Material Property		shader_property="Blend Operation"		tt="Enable blend operation control"		help="featuresreference/transparency/blending/blending/blendoperation"
 warning	msgType=info	needs=CUSTOM_BLENDING	lbl="Look at the <b>Shader Properties</b> tab to setup the custom blending states."
 space	space=4			needs=CUSTOM_BLENDING
 warning	msgType=warning				needs=CUSTOM_BLENDING					lbl="The Custom Blending factors will only apply to the <b>Forward Base</b> pass (main directional light).  <b>Forward Add</b> passes (additional lights) will use <b>One One</b> as the blending factors.  This is unfortunately a surface shader limitation."
 space	space=4			needs=CUSTOM_BLENDING
 ---
-sngl	lbl="Depth pre-pass"		kw=DEPTH_PREPASS		tt="Adds a depth only shader pass, to prevent parts of the mesh from being visible through itself."
+sngl	lbl="Depth pre-pass"		kw=DEPTH_PREPASS		tt="Adds a depth only shader pass, to prevent parts of the mesh from being visible through itself."		help="featuresreference/transparency/blending/depthpre-pass"
 ---
-sngl	lbl="Alpha Testing (Cutout)"	kw=ALPHA_TESTING
+sngl	lbl="Alpha Testing (Cutout)"	kw=ALPHA_TESTING			help="featuresreference/transparency/blending/alphatesting"
 sngl	lbl="Alpha to Coverage"			kw=ALPHA_TO_COVERAGE		needs=ALPHA_TESTING							indent		tt="Enables Alpha to Coverage, which allows MSAA anti-aliasing to be used with alpha testing"
 sngl	lbl="Disable alpha sharpening"	kw=ALPHA_TO_COVERAGE_RAW	needs=ALPHA_TESTING,ALPHA_TO_COVERAGE		indent=2	tt="Disables screen-space alpha sharpening, which is used to get proper anti-aliasing with Alpha to Coverage"
 dd_end
 dd_start	lbl="SHADER STATES"
 ---
-mult_fs		lbl="Face Culling (Double-sided)"		kw=CULLING	options=Default|,Custom|Constant,Material Property|Material Property		shader_property="Face Culling"		tt="Enable face culling control"
-mult		lbl="Backface Lighting"		kw=Off|,Flip Normal (Z)|BACKFACE_LIGHTING_Z,Flip Normal (XYZ)|BACKFACE_LIGHTING_XYZ		indent	tt="Invert the normals on backfaces for accurate lighting calculation (this may not work properly with shadows and introduce other artifacts)"
+subh		lbl="Shader States"		help="featuresreference/shaderstates"
 ---
-mult_fs		lbl="Depth Write"			kw=ZWRITE		options=Default|,Custom|Constant,Material Property|Material Property	shader_property="Depth Write"		tt="Enable depth write (ZWrite) value control"
-mult_fs		lbl="Depth Test"			kw=ZTEST		options=Default|,Custom|Constant,Material Property|Material Property	shader_property="Depth Test"		tt="Enable depth test (ZTest) control"
+mult_fs		lbl="Face Culling (Double-sided)"	excl=AUTO_TRANSPARENT_BLENDING	kw=CULLING	options=Default|,Custom|Constant,Material Property|Material Property	shader_property="Face Culling"	tt="Enable face culling control"
+mult		lbl="Backface Lighting"		kw=Off|,Flip Normal (Z)|BACKFACE_LIGHTING_Z,Flip Normal (XYZ)|BACKFACE_LIGHTING_XYZ		tt="Invert the normals on backfaces for accurate lighting calculation (this may not work properly with shadows and introduce other artifacts)"
+---
+mult_fs		lbl="Depth Write"	excl=AUTO_TRANSPARENT_BLENDING		kw=ZWRITE	options=Default|,Custom|Constant,Material Property|Material Property	shader_property="Depth Write"	tt="Enable depth write (ZWrite) value control"
+mult_fs		lbl="Depth Test"										kw=ZTEST	options=Default|,Custom|Constant,Material Property|Material Property	shader_property="Depth Test"	tt="Enable depth test (ZTest) control"
 ---
 mult	lbl="Stencil"						kw=Off|,Custom|STENCIL				tt="Enable stencil control (see the Properties tab)"
 warning	msgType=info	needs=STENCIL	lbl="Look at the <b>Shader Properties</b> tab to setup the stencil states."
@@ -141,27 +159,36 @@ dd_end
 dd_start	lbl="OPTIONS"
 ---
 subh	lbl="Shadows"
-flag	lbl="Add Shadow/Depth Pass"		kw=addshadow							tt="Force the shader to have the Shadow Caster pass.  Can help if shadows don't work properly with the shader.  Note that this pass is also used to render the object on the depth texture."
-flag	lbl="Full Forward Shadows"		kw=fullforwardshadows					tt="Enable support for all shadow types in Forward rendering path"
-flag	lbl="Disable Shadow Receiving"	kw=noshadow								tt="Disables all shadow receiving support in this shader"
+flag	lbl="Add Shadow/Depth Pass"		kw=addshadow			block="pragma_surface_shader"		tt="Force the shader to have the Shadow Caster pass.  Can help if shadows don't work properly with the shader.  Note that this pass is also used to render the object on the depth texture."
+flag	lbl="Full Forward Shadows"		kw=fullforwardshadows	block="pragma_surface_shader"		tt="Enable support for all shadow types in Forward rendering path"
+flag	lbl="Disable Shadow Receiving"	kw=noshadow				block="pragma_surface_shader"		tt="Disables all shadow receiving support in this shader"
 space	space=4
 subh	lbl="Misc"
-sngl	lbl="Enable Fog"					kw=ENABLE_FOG							tt="Disables Unity Fog support.  Can help if you run out of vertex interpolators and don't need fog."
-sngl	lbl="Enable Lightmaps"			kw=ENABLE_LIGHTMAPS						tt="Enable lightmap support (Dynamic/Baked GI support)"
-sngl	lbl="Enable LPPV"					kw=ENABLE_LPPV							tt="Enable Light Probe Proxy Volume support"
-flag	lbl="Disable Vertex Lighting"		kw=novertexlights						tt="Disable vertex lights and spherical harmonics (light probes)"
-sngl	lbl="Disable Dynamic Batching"	kw=DISABLE_BATCHING						tt="Disable dynamic batching support for this shader"
+sngl	lbl="Enable Fog"				kw=ENABLE_FOG												tt="Disables Unity Fog support.  Can help if you run out of vertex interpolators and don't need fog."
+sngl	lbl="Enable Lightmaps"			kw=ENABLE_LIGHTMAPS											tt="Enable lightmap support (Dynamic/Baked GI support)"
+sngl	lbl="Enable LPPV"				kw=ENABLE_LPPV												tt="Enable Light Probe Proxy Volume support"
+flag	lbl="Disable Vertex Lighting"	kw=novertexlights		block="pragma_surface_shader"		tt="Disable vertex lights and spherical harmonics (light probes)"
+sngl	lbl="Disable Dynamic Batching"	kw=DISABLE_BATCHING											tt="Disable dynamic batching support for this shader"
 space	space=4
 subh	lbl="Mobile-Friendly"
-flag	lbl="One Directional Light"		kw=noforwardadd							tt="Use additive lights as vertex lights, so that no additional lighting passes are used."
-flag	lbl="Vertex View Dir"				kw=interpolateview						tt="Calculate view direction per-vertex instead of per-pixel."	needsOr=SPECULAR,SPECULAR_ANISOTROPIC,SUBSURFACE,PARALLAX,RIM,RIM_OUTLINE
-flag	lbl="Half as View"				kw=halfasview							tt="Pass half-direction vector into the lighting function instead of view-direction.  Faster but inaccurate."		needsOr=SPECULAR,SPECULAR_ANISOTROPIC,SUBSURFACE,PARALLAX,RIM,RIM_OUTLINE
+flag	lbl="One Directional Light"		kw=noforwardadd			block="pragma_surface_shader"		tt="Use additive lights as vertex lights, so that no additional lighting passes are used."
+flag	lbl="Vertex View Dir"				kw=interpolateview	block="pragma_surface_shader"		tt="Calculate view direction per-vertex instead of per-pixel."	needsOr=SPECULAR,SPECULAR_ANISOTROPIC,SUBSURFACE,PARALLAX,RIM,RIM_OUTLINE
+flag	lbl="Half as View"				kw=halfasview			block="pragma_surface_shader"		tt="Pass half-direction vector into the lighting function instead of view-direction.  Faster but inaccurate."		needsOr=SPECULAR,SPECULAR_ANISOTROPIC,SUBSURFACE,PARALLAX,RIM,RIM_OUTLINE
+space	space=4
+subh	lbl="GPU Instancing Options"
+flag	lbl="Assume Uniform Scaling"	kw=assumeuniformscaling		block="pragma_gpu_instancing"		tt="Use this to instruct Unity to assume that all the instances have uniform scalings (the same scale for all X, Y and Z axes)."
+flag	lbl="No LOD Fade"				kw=nolodfade				block="pragma_gpu_instancing"		tt="Use this to prevent Unity from applying GPU Instancing to LOD fade values."
+flag	lbl="No Light Probe"			kw=nolightprobe				block="pragma_gpu_instancing"		tt="Use this to prevent Unity from applying GPU Instancing to Light Probe values (including their occlusion data). This is useful for performance if you are absolutely sure that there are no GameObjects using both GPU Instancing and Light Probes."
+flag	lbl="No Lightmap"				kw=nolightmap				block="pragma_gpu_instancing"		tt="Use this to prevent Unity from applying GPU Instancing to Lightmap ST (atlas information) values. This is useful for performance if you are absolutely sure that there are no GameObjects using both GPU Instancing and lightmaps."
+mult	lbl="Max Count"					kw=Off|,Define|GPU_INSTANCING_MAX_COUNT_DEFINE,Force|GPU_INSTANCING_MAX_COUNT_FORCE		tt="Use this to prevent Unity from applying GPU Instancing to Lightmap ST (atlas information) values. This is useful for performance if you are absolutely sure that there are no GameObjects using both GPU Instancing and lightmaps."
+int		lbl="Max Count Value"			kw=GPU_INSTANCING_MAX_COUNT_VALUE	indent	needsOr=GPU_INSTANCING_MAX_COUNT_DEFINE,GPU_INSTANCING_MAX_COUNT_FORCE	default=50	min=1	max=2147483647
 dd_end
 dd_start	lbl="THIRD PARTY PLUGINS"
 ---
 [[MODULE:FEATURES:VertExmotion]]
+---
 [[MODULE:FEATURES:CurvedWorld]]
-[[MODULE:FEATURES:Aura2]]
+#[[MODULE:FEATURES:Aura2]]
 dd_end
 
 #END
@@ -191,10 +218,12 @@ color		Shadow Color		lighting, imp(color, label = "Shadow Color", variable = "_S
 
 [[MODULE:PROPERTIES_NEW:Specular]]
 [[MODULE:PROPERTIES_NEW:Rim Lighting]]
-/// IF GLOSSY_REFLECTIONS
-	header		Reflection Probes
+/// IF GLOSSY_REFLECTIONS || PLANAR_REFLECTION
+	header		Reflections
 	color		Reflection Color			lighting, imp(color, label = "Color", default = (1, 1, 1, 1))
+	/// IF GLOSSY_REFLECTIONS
 	float		Reflection Smoothness		lighting, imp(range, label = "Smoothness", default = 0.5, min = 0, max = 1)
+	///
 ///
 /// IF EMISSION
 	header		Emission
@@ -208,6 +237,7 @@ color		Shadow Color		lighting, imp(color, label = "Shadow Color", variable = "_S
 [[MODULE:PROPERTIES_NEW:Reflection]]
 [[MODULE:PROPERTIES_NEW:MatCap]]
 [[MODULE:PROPERTIES_NEW:Custom Ambient]]
+[[MODULE:PROPERTIES_NEW:Vertex Displacement]]
 [[MODULE:PROPERTIES_NEW:Normal Mapping]]
 [[MODULE:PROPERTIES_NEW:Triplanar]]
 [[MODULE:PROPERTIES_NEW:Texture Blending]]
@@ -215,6 +245,8 @@ color		Shadow Color		lighting, imp(color, label = "Shadow Color", variable = "_S
 [[MODULE:PROPERTIES_NEW:Sketch]]
 [[MODULE:PROPERTIES_NEW:Outline]]
 [[MODULE:PROPERTIES_NEW:Wind]]
+[[MODULE:PROPERTIES_NEW:Water]]
+[[MODULE:PROPERTIES_NEW:Depth Texture]]
 [[MODULE:PROPERTIES_NEW:Dissolve]]
 [[MODULE:PROPERTIES_NEW:Vertical Fog]]
 /// IF PASS_SILHOUETTE
@@ -283,7 +315,7 @@ color			Main Light Color				lighting, label = "Main Light Color", imp(hook, labe
 color			Additional Lights Color			lighting, label = "Additional Lights Color", imp(hook, label = "lightColor", toggles = HOOK_OTHER_LIGHTS_COLOR), help = "The color of additional lights."
 color			Shading Ramp					lighting, label = "Shading Ramp", imp(hook, label = "ramp", toggles = HOOK_RAMP), help = "The colored ramp calculated, depending on the ramp settings, with the highlight and shadow colors."
 color			Main Light Attenuation			lighting, label = "Main Light Attenuation", imp(hook, label = "atten", toggles = HOOK_MAIN_LIGHT_ATTEN), help = "The attenuation of the main directional light (shadow map)."
-color			Additional Lights Attenuation	lighting, label = "Additional Lights Attenuation", imp(hook, label = "atten", toggles = HOOK_OTHER_LIGHTS_ATTEN), help = "The color of additional lights (shadow map and distance attenuation)."
+color			Additional Lights Attenuation	lighting, label = "Additional Lights Attenuation", imp(hook, label = "atten", toggles = HOOK_OTHER_LIGHTS_ATTEN), help = "The attenuation of additional lights (shadow map and distance attenuation)."
 color			Final Albedo			fragment, imp(hook, label = "output.Albedo.rgb", toggles = HOOK_FINAL_ALBEDO), help = "The final albedo color used by the shader before lighting."
 color			Final Ambient			fragment, imp(hook, label = "ambient.rgb", toggles = HOOK_FINAL_AMBIENT), help = "The final ambient color used by the shader, with any modifiers applied (e.g. Occlusion)"
 color_rgba		Final Color				fragment, imp(hook, label = "color.rgba", toggles = HOOK_FINAL_COLOR), help = "The final color returned by the shader, after having processed all lighting and effects."
@@ -315,28 +347,41 @@ header		Misc
 ///
 /// IF UNITY_5_6
 	/// IF !ENABLE_LPPV
-		flag_on			nolppv
+		flag_on		nolppv
 	/// ELSE
-		flag_off		nolppv
+		flag_off	nolppv
 	///
 ///
-/// IF SHADER_BLENDING
+/// IF SHADER_BLENDING || AUTO_TRANSPARENT_BLENDING
 	flag_on			keepalpha
 /// ELSE
 	flag_off		keepalpha
 ///
 
-# blending
-/// IF ALPHA_BLENDING
-	flag_on		alpha:blend
+/// IF GPU_INSTANCING_MAX_COUNT_DEFINE
+	flag_on:pragma_gpu_instancing		maxcount
+	flag_off:pragma_gpu_instancing		forcemaxcount
+/// ELIF GPU_INSTANCING_MAX_COUNT_FORCE
+	flag_on:pragma_gpu_instancing		forcemaxcount
+	flag_off:pragma_gpu_instancing		maxcount
 /// ELSE
-	flag_off	alpha:blend
+	flag_off:pragma_gpu_instancing		forcemaxcount
+	flag_off:pragma_gpu_instancing		maxcount
 ///
 
-/// IF ALPHA_BLENDING_PREMULT
-	flag_on		alpha:premul
-/// ELSE
-	flag_off	alpha:premul
+# blending
+/// IF !AUTO_TRANSPARENT_BLENDING
+	/// IF ALPHA_BLENDING
+		flag_on		alpha:blend
+	/// ELSE
+		flag_off	alpha:blend
+	///
+
+	/// IF ALPHA_BLENDING_PREMULT
+		flag_on		alpha:premul
+	/// ELSE
+		flag_off	alpha:premul
+	///
 ///
 
 # features
@@ -400,6 +445,16 @@ Shader "@%SHADER_NAME%@"
 {
 	Properties
 	{
+/// IF AUTO_TRANSPARENT_BLENDING
+		[Enum(Front, 2, Back, 1, Both, 0)] _Cull ("Render Face", Float) = 2.0
+		[TCP2ToggleNoKeyword] _ZWrite ("Depth Write", Float) = 1.0
+		[HideInInspector] _RenderingMode ("rendering mode", Float) = 0.0
+		[HideInInspector] _SrcBlend ("blending source", Float) = 1.0
+		[HideInInspector] _DstBlend ("blending destination", Float) = 0.0
+		[TCP2Separator]
+
+///
+		[[INJECTION_POINT:Properties/Start]]
 		[TCP2HeaderHelp(Base)]
 		[[PROP:Main Color]]
 		[[PROP:Highlight Color]]
@@ -427,25 +482,27 @@ Shader "@%SHADER_NAME%@"
 		[TCP2Separator]
 ///
 		[[MODULE:PROPERTIES_BLOCK:Rim Lighting]]
-/// IF (GLOSSY_REFLECTIONS || REFLECTION_CUBEMAP)
+/// IF (GLOSSY_REFLECTIONS || REFLECTION_CUBEMAP || PLANAR_REFLECTION)
 
 		[TCP2HeaderHelp(Reflections)]
 	/// IF REFLECTION_SHADER_FEATURE
 		[Toggle(TCP2_REFLECTIONS)] _UseReflections ("Enable Reflections", Float) = 0
 	///
 ///
-/// IF GLOSSY_REFLECTIONS
+/// IF GLOSSY_REFLECTIONS || PLANAR_REFLECTION
 		[[PROP:Reflection Color]]
+///
+/// IF GLOSSY_REFLECTIONS
 		[[PROP:Reflection Smoothness]]
 ///
 		[[MODULE:PROPERTIES_BLOCK:Reflection]]
-/// IF (GLOSSY_REFLECTIONS || REFLECTION_CUBEMAP)
+/// IF (GLOSSY_REFLECTIONS || REFLECTION_CUBEMAP || PLANAR_REFLECTION)
 		[TCP2Separator]
 ///
 		[[MODULE:PROPERTIES_BLOCK:Subsurface Scattering]]
 		[[MODULE:PROPERTIES_BLOCK:MatCap]]
 	#if_not_empty
-		[Header(Ambient Lighting)]
+		[TCP2HeaderHelp(Ambient Lighting)]
 	#start_not_empty_block
 /// IF AMBIENT_SHADER_FEATURE
 		[Toggle(TCP2_AMBIENT)] _UseAmbient ("Enable Ambient/Indirect Diffuse", Float) = 0
@@ -455,12 +512,14 @@ Shader "@%SHADER_NAME%@"
 	#end_not_empty_block
 		[TCP2Separator]
 	#end_not_empty
+		[[MODULE:PROPERTIES_BLOCK:Vertex Displacement]]
 		[[MODULE:PROPERTIES_BLOCK:Triplanar]]
 		[[MODULE:PROPERTIES_BLOCK:Normal Mapping]]
 		[[MODULE:PROPERTIES_BLOCK:Texture Blending]]
 		[[MODULE:PROPERTIES_BLOCK:NdotL Stylization]]
 		[[MODULE:PROPERTIES_BLOCK:Sketch]]
 		[[MODULE:PROPERTIES_BLOCK:Wind]]
+		[[MODULE:PROPERTIES_BLOCK:Water]]
 		[[MODULE:PROPERTIES_BLOCK:Dissolve]]
 		[[MODULE:PROPERTIES_BLOCK:Vertical Fog]]
 /// IF PASS_SILHOUETTE
@@ -472,6 +531,7 @@ Shader "@%SHADER_NAME%@"
 ///
 		[[MODULE:PROPERTIES_BLOCK:Outline]]
 		[[MODULE:PROPERTIES_BLOCK:NoTile Sampling]]
+		[[MODULE:PROPERTIES_BLOCK:Triplanar Sampling]]
 /// IF USE_NDV_MIN_MAX_VERT
 		[[PROP:NDV Min Vert]]
 		[[PROP:NDV Max Vert]]
@@ -514,6 +574,13 @@ Shader "@%SHADER_NAME%@"
 ///
 		[[PROPERTIES]]
 
+		[[MODULE:PROPERTIES_BLOCK:CurvedWorld]]
+
+/// IF CUSTOM_TIME
+		_CustomTime ("Custom Time", Vector) = (0.05, 1, 2, 3)
+///
+		[[INJECTION_POINT:Properties/End]]
+
 		//Avoid compile error if the properties are ending with a drawer
 		[HideInInspector] __dummy__ ("unused", Float) = 0
 	}
@@ -542,38 +609,52 @@ Shader "@%SHADER_NAME%@"
 /// ELSE
 			"RenderType"="@%RENDER_TYPE%@"
 ///
+			[[INJECTION_POINT:SubShader/Tags]]
 		}
 
-	#if_not_empty
+		[[INJECTION_POINT:SubShader/Shader States]]
+
 		CGINCLUDE
-	#start_not_empty_block
+
+		#include "UnityCG.cginc"
+		#include "UnityLightingCommon.cginc"	// needed for LightColor
+
+/// IF CUSTOM_TIME
+
+		// Custom time variable overriding the built-in one
+		#define _Time _CustomTime
+///
+
+		[[INJECTION_POINT:Include Files]]
+
+/// IF CUSTOM_TIME
+		float4 _CustomTime;
+///
+		[[VARIABLES_OUTSIDE_CBUFFER_INCLUDE]]
+		[[VARIABLES_INCLUDE]]
+
+		[[INJECTION_POINT:Variables/Outside CBuffer]]
+		[[INJECTION_POINT:Variables/Inside CBuffer]]
+
+		[[VARIABLES_GPU_INSTANCING_INCLUDE]]
+
+		[[MODULE:VARIABLES]]
+
 		[[MODULE:FUNCTIONS]]
 
-		[[MODULE:VARIABLES:Screen Space UV]]
-		[[MODULE:VARIABLES:HSV]]
-		[[MODULE:VARIABLES:Hash Functions]]
-		[[MODULE:VARIABLES:NoTile Sampling]]
-		[[MODULE:VARIABLES:VertExmotion]]
-		[[MODULE:VARIABLES:CurvedWorld]]
-		[[MODULE:VARIABLES:Aura2]]		
-	#end_not_empty_block
+		[[INJECTION_POINT:Functions]]
+
 		ENDCG
 
-	#end_not_empty
 #PASS
 /// IF OUTLINE
 		// Outline Include
 		CGINCLUDE
 
-		#include "UnityCG.cginc"
-		#include "UnityLightingCommon.cginc"	// needed for LightColor
-		
 	/// IF ENABLE_FOG
 		#pragma multi_compile_fog
 	///
-
-		[[VARIABLES_INCLUDE]]
-		[[VARIABLES_GPU_INSTANCING_INCLUDE]]
+		[[INJECTION_POINT:Outline Pass/Pragma]]
 
 		struct appdata_outline
 		{
@@ -587,7 +668,7 @@ Shader "@%SHADER_NAME%@"
 		#if TCP2_COLORS_AS_NORMALS
 			float4 vertexColor : COLOR;
 		#endif
-	///		
+	///
 	/// IF !USE_TANGENT_VERT && !USE_TANGENT_FRAGMENT && !VERTEXMOTION_NORMAL && !CURVED_WORLD_NORMAL
 		#if TCP2_TANGENT_AS_NORMALS
 	///
@@ -595,6 +676,7 @@ Shader "@%SHADER_NAME%@"
 	/// IF !USE_TANGENT_VERT && !USE_TANGENT_FRAGMENT && !VERTEXMOTION_NORMAL && !CURVED_WORLD_NORMAL
 		#endif
 	///
+			[[INJECTION_POINT:Outline Pass/Attributes]]
 			UNITY_VERTEX_INPUT_INSTANCE_ID
 		};
 
@@ -618,8 +700,18 @@ Shader "@%SHADER_NAME%@"
 	/// IF USE_WORLD_POSITION_FRAGMENT
 			float3 worldPos;
 	///
+	/// IF USE_WORLD_NORMAL_FRAGMENT
+			float3 worldNormal;
+	///
+	/// IF USE_OBJECT_POSITION_FRAGMENT
+			float3 objPos;
+	///
+	/// IF USE_OBJECT_NORMAL_FRAGMENT
+			float3 objNormal;
+	///
 			[[MODULE:INPUT:Outline]]
 #END
+			[[INJECTION_POINT:Outline Pass/Varyings]]
 		};
 
 #INPUT = v
@@ -632,8 +724,13 @@ Shader "@%SHADER_NAME%@"
 			UNITY_SETUP_INSTANCE_ID(v);
 			UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
+			[[INJECTION_POINT:Outline Pass/Vertex Shader/Start]]
+
 /// IF USE_WORLD_POSITION_UV_VERTEX
 			float3 worldPosUv = mul(unity_ObjectToWorld, v.vertex).xyz;
+///
+/// IF USE_WORLD_NORMAL_UV_VERTEX || USE_WORLD_NORMAL_FRAGMENT
+			float3 worldNormalUv = mul(unity_ObjectToWorld, float4(v.normal, 1.0)).xyz;
 ///
 			[[VERTEX_TEXCOORDS]]
 			[[SAMPLE_CUSTOM_PROPERTIES]]
@@ -642,10 +739,14 @@ Shader "@%SHADER_NAME%@"
 			[[MODULE:VERTEX:VertExmotion(v.vertex, v.normal, v.tangent)]]
 			[[MODULE:VERTEX:CurvedWorld(v.vertex, v.normal, v.tangent)]]
 
+			[[MODULE:VERTEX:Vertex Displacement(v.vertex)]]
 	/// IF HOOK_VERTEX_POSITION
 			v.vertex.xyz = [[SAMPLE_VALUE_SHADER_PROPERTY:Vertex Position]];
 	///
+	/// IF HOOK_VERTEX_POSITION_WORLD || APPLY_WORLD_POSITION || USE_WORLD_POSITION_FRAGMENT || USE_WORLD_POSITION_VERTEX
 			float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+	///
+			[[MODULE:VERTEX:Vertex Displacement:WORLD(worldPos)]]
 	/// IF HOOK_VERTEX_POSITION_WORLD
 			worldPos.xyz = [[SAMPLE_VALUE_SHADER_PROPERTY:Vertex Position World]];
 	///
@@ -653,14 +754,22 @@ Shader "@%SHADER_NAME%@"
 	/// IF APPLY_WORLD_POSITION
 			v.vertex.xyz = mul(unity_WorldToObject, float4(worldPos, 1)).xyz;
 	///
+			[[MODULE:VERTEX:Water(v.vertex, worldPos, v.normal)]]
+	/// IF USE_OBJECT_POSITION_FRAGMENT
+			output.[[INPUT_VALUE:objPos]] = v.vertex.xyz;
+	///
+	/// IF USE_OBJECT_NORMAL_FRAGMENT
+			output.[[INPUT_VALUE:objNormal]] = v.normal.xyz;
+	///
 	/// IF USE_WORLD_POSITION_FRAGMENT
 			output.[[INPUT_VALUE:worldPos]] = worldPos;
+	///
+	/// IF USE_WORLD_NORMAL_FRAGMENT
+			output.[[INPUT_VALUE:worldNormal]] = worldNormalUv;
 	///
 	/// IF USE_VERTEX_COLORS_FRAG
 			output.vertexColor = v.vertexColor;
 	///
-			[[MODULE:VERTEX:Screen Space UV(screenPos, clipPos, output)]]
-		[[MODULE:VERTEX:Outline(v, output, null)]]
 	/// IF USE_CLIP_POSITION_VERTEX || USE_SCREEN_POSITION_FRAGMENT || USE_SCREEN_POSITION_VERTEX
 			float4 clipPos = output.vertex;
 	///
@@ -672,10 +781,16 @@ Shader "@%SHADER_NAME%@"
 			output.screenPosition = screenPos;
 		///
 	///
+			[[MODULE:VERTEX:Screen Space UV(screenPos, clipPos, output)]]
+			[[MODULE:VERTEX:Depth Texture(output.screenPosition, clipPos)]]
+		[[MODULE:VERTEX:Outline(v, output, null)]]
 	/// IF ENABLE_FOG
 #note: fog is handled in Module_Outline for the fragment part!
 			UNITY_TRANSFER_FOG(output, output.vertex);
 	///
+
+			[[INJECTION_POINT:Outline Pass/Vertex Shader/End]]
+
 			return output;
 		}
 
@@ -684,14 +799,19 @@ Shader "@%SHADER_NAME%@"
 #FRAGMENT
 		float4 fragment_outline (v2f_outline input) : SV_Target
 		{
+			[[INJECTION_POINT:Outline Pass/Fragment Shader/Start]]
+
 			[[MODULE:FRAGMENT:Screen Space UV(input.screenPosition, input)]]
 			[[SAMPLE_CUSTOM_PROPERTIES]]
 			[[SAMPLE_SHADER_PROPERTIES]]
 			[[MODULE:FRAGMENT:Outline(input)]]
+			[[MODULE:FRAGMENT:Dissolve(outlineColor.rgb)]]
 			[[MODULE:FRAGMENT:Vertical Fog(outlineColor.rgb, input.[[INPUT_VALUE:worldPos]])]]
 	/// IF ENABLE_FOG
 			UNITY_APPLY_FOG(input.fogCoord, outlineColor);
 	///
+			[[INJECTION_POINT:Outline Pass/Fragment Shader/End]]
+
 			return outlineColor;
 		}
 
@@ -704,7 +824,11 @@ Shader "@%SHADER_NAME%@"
 		Pass
 		{
 			Name "Outline"
-			Tags { "LightMode"="ForwardBase" }
+			Tags
+			{
+				"LightMode"="ForwardBase"
+				[[INJECTION_POINT:Outline Pass/Tags]]
+			}
 			Cull Off
 			ZWrite Off
 	/// IF OUTLINE_ZSMOOTH
@@ -715,6 +839,7 @@ Shader "@%SHADER_NAME%@"
 	/// ELIF OUTLINE_OPAQUE
 			Blend Off
 	///
+			[[INJECTION_POINT:Outline Pass/Shader States]]
 
 			CGPROGRAM
 			#pragma vertex vertex_outline
@@ -722,6 +847,7 @@ Shader "@%SHADER_NAME%@"
 			#pragma multi_compile _ TCP2_COLORS_AS_NORMALS TCP2_TANGENT_AS_NORMALS TCP2_UV1_AS_NORMALS TCP2_UV2_AS_NORMALS TCP2_UV3_AS_NORMALS TCP2_UV4_AS_NORMALS
 			#pragma multi_compile _ TCP2_UV_NORMALS_FULL TCP2_UV_NORMALS_ZW
 			#pragma multi_compile_instancing
+			[[GPU_INSTANCING_OPTIONS]]
 			#pragma target @%SHADER_TARGET%@
 			ENDCG
 		}
@@ -733,6 +859,7 @@ Shader "@%SHADER_NAME%@"
 			Ref [[VALUE:Outline Stencil Reference]]
 			Comp Always
 			Pass Replace
+			[[INJECTION_POINT:Outline Pass/Stencil]]
 		}
 ///
 #PASS
@@ -742,17 +869,20 @@ Shader "@%SHADER_NAME%@"
 		Pass
 		{
 			Name "Depth Prepass"
-			Tags { "LightMode"="ForwardBase" }
+			Tags
+			{
+				"LightMode"="ForwardBase"
+				[[INJECTION_POINT:Depth Pre-Pass/Tags]]
+			}
 			ColorMask 0
 			ZWrite On
+			[[INJECTION_POINT:Depth Pre-Pass/Shader States]]
 
 			CGPROGRAM
 			#pragma vertex vertex_depthprepass
 			#pragma fragment fragment_depthprepass
 			#pragma target @%SHADER_TARGET%@
-
-			#include "UnityCG.cginc"
-			#include "UnityLightingCommon.cginc"	// needed for LightColor
+			[[INJECTION_POINT:Depth Pre-Pass/Pragma]]
 
 			struct appdata_sil
 			{
@@ -761,10 +891,11 @@ Shader "@%SHADER_NAME%@"
 	/// IF USE_VERTEX_COLORS_VERT
 				fixed4 vertexColor : COLOR;
 	///
-	/// IF VERTEXMOTION_NORMAL || CURVED_WORLD_NORMAL
 				float3 normal : NORMAL;
+	/// IF VERTEXMOTION_NORMAL || CURVED_WORLD_NORMAL
 				float4 tangent : TANGENT;
 	///
+				[[INJECTION_POINT:Depth Pre-Pass/Attributes]]
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
@@ -780,12 +911,22 @@ Shader "@%SHADER_NAME%@"
 	/// IF USE_SCREEN_POSITION_FRAGMENT
 				float4 screenPosition;
 	///
+	/// IF USE_WORLD_POSITION_FRAGMENT
+				float3 worldPos;
+	///
+	/// IF USE_WORLD_NORMAL_FRAGMENT
+				float3 worldNormal;
+	///
+	/// IF USE_OBJECT_POSITION_FRAGMENT
+				float3 objPos;
+	///
+	/// IF USE_OBJECT_NORMAL_FRAGMENT
+				float3 objNormal;
+	///
 				[[MODULE:INPUT]]
 #END
+				[[INJECTION_POINT:Depth Pre-Pass/Varyings]]
 			};
-
-			[[VARIABLES]]
-			[[VARIABLES_GPU_INSTANCING]]
 
 #INPUT = v
 #OUTPUT = output
@@ -797,8 +938,13 @@ Shader "@%SHADER_NAME%@"
 				UNITY_SETUP_INSTANCE_ID(v);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
+				[[INJECTION_POINT:Depth Pre-Pass/Vertex Shader/Start]]
+
 /// IF USE_WORLD_POSITION_UV_VERTEX
 				float3 worldPosUv = mul(unity_ObjectToWorld, v.vertex).xyz;
+///
+/// IF USE_WORLD_NORMAL_UV_VERTEX || USE_WORLD_NORMAL_FRAGMENT
+				float3 worldNormalUv = mul(unity_ObjectToWorld, float4(v.normal, 1.0)).xyz;
 ///
 				[[VERTEX_TEXCOORDS]]
 				[[SAMPLE_CUSTOM_PROPERTIES]]
@@ -807,16 +953,33 @@ Shader "@%SHADER_NAME%@"
 				[[MODULE:VERTEX:VertExmotion(v.vertex, v.normal, v.tangent)]]
 				[[MODULE:VERTEX:CurvedWorld(v.vertex, v.normal, v.tangent)]]
 
+				[[MODULE:VERTEX:Vertex Displacement(v.vertex)]]
 	/// IF HOOK_VERTEX_POSITION
 				v.vertex.xyz = [[SAMPLE_VALUE_SHADER_PROPERTY:Vertex Position]];
 	///
+	/// IF HOOK_VERTEX_POSITION_WORLD || APPLY_WORLD_POSITION || USE_WORLD_POSITION_FRAGMENT || USE_WORLD_POSITION_VERTEX
 				float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+	///
+				[[MODULE:VERTEX:Vertex Displacement:WORLD(worldPos)]]
 	/// IF HOOK_VERTEX_POSITION_WORLD
 				worldPos.xyz = [[SAMPLE_VALUE_SHADER_PROPERTY:Vertex Position World]];
 	///
 				[[MODULE:VERTEX:Wind(worldPos.xyz)]]
 	/// IF APPLY_WORLD_POSITION
 				v.vertex.xyz = mul(unity_WorldToObject, float4(worldPos, 1)).xyz;
+	///
+				[[MODULE:VERTEX:Water(v.vertex, worldPos, v.normal)]]
+	/// IF USE_OBJECT_POSITION_FRAGMENT
+				output.[[INPUT_VALUE:objPos]] = v.vertex.xyz;
+	///
+	/// IF USE_OBJECT_NORMAL_FRAGMENT
+				output.[[INPUT_VALUE:objNormal]] = v.normal.xyz;
+	///
+	/// IF USE_WORLD_POSITION_FRAGMENT
+				output.[[INPUT_VALUE:worldPos]] = worldPos;
+	///
+	/// IF USE_WORLD_NORMAL_FRAGMENT
+				output.[[INPUT_VALUE:worldNormal]] = worldNormalUv;
 	///
 				output.vertex = UnityObjectToClipPos(v.vertex);
 	/// IF USE_VERTEX_COLORS_FRAG
@@ -833,7 +996,11 @@ Shader "@%SHADER_NAME%@"
 				output.screenPosition = screenPos;
 		///
 	///
+				[[MODULE:VERTEX:Depth Texture(output.screenPosition, clipPos)]]
 				[[MODULE:VERTEX:Screen Space UV(screenPos, clipPos, output)]]
+
+				[[INJECTION_POINT:Depth Pre-Pass/Vertex Shader End]]
+
 				return output;
 			}
 
@@ -842,9 +1009,14 @@ Shader "@%SHADER_NAME%@"
 #FRAGMENT
 			half4 fragment_depthprepass (v2f_depthprepass input) : SV_Target
 			{
+				[[INJECTION_POINT:Depth Pre-Pass/Fragment Shader/Start]]
+
 				[[MODULE:FRAGMENT:Screen Space UV(input.screenPosition, input)]]
 				[[SAMPLE_CUSTOM_PROPERTIES]]
 				[[SAMPLE_SHADER_PROPERTIES]]
+
+				[[INJECTION_POINT:Depth Pre-Pass/Fragment Shader/End]]
+
 				return 0;
 			}
 			ENDCG
@@ -856,10 +1028,15 @@ Shader "@%SHADER_NAME%@"
 		Pass
 		{
 			Name "Silhouette"
-			Tags { "LightMode"="ForwardBase" }
+			Tags
+			{
+				"LightMode"="ForwardBase"
+				[[INJECTION_POINT:Silhouette Pass/Tags]]
+			}
 			Blend [[VALUE:Silhouette Blend Source]] [[VALUE:Silhouette Blend Destination]]
 			ZTest Greater
 			ZWrite Off
+			[[INJECTION_POINT:Silhouette Pass/Shader States]]
 	/// IF SILHOUETTE_STENCIL
 
 			Stencil
@@ -869,16 +1046,17 @@ Shader "@%SHADER_NAME%@"
 				Pass Replace
 				ReadMask [[VALUE:Silhouette Stencil Reference]]
 				WriteMask [[VALUE:Silhouette Stencil Reference]]
+				[[INJECTION_POINT:Silhouette Pass/Stencil]]
 			}
 	///
 
 			CGPROGRAM
 			#pragma vertex vertex_silhouette
 			#pragma fragment fragment_silhouette
+			#pragma multi_compile_instancing
+			[[GPU_INSTANCING_OPTIONS]]
 			#pragma target @%SHADER_TARGET%@
-
-			#include "UnityCG.cginc"
-			#include "UnityLightingCommon.cginc"	// needed for LightColor
+			[[INJECTION_POINT:Silhouette Pass/Pragma]]
 
 			struct appdata_sil
 			{
@@ -887,10 +1065,11 @@ Shader "@%SHADER_NAME%@"
 	/// IF USE_VERTEX_COLORS_VERT
 				fixed4 vertexColor : COLOR;
 	///
-	/// IF VERTEXMOTION_NORMAL || CURVED_WORLD_NORMAL
 				float3 normal : NORMAL;
+	/// IF VERTEXMOTION_NORMAL || CURVED_WORLD_NORMAL
 				float4 tangent : TANGENT;
 	///
+				[[INJECTION_POINT:Silhouette Pass/Attributes]]
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
@@ -906,12 +1085,22 @@ Shader "@%SHADER_NAME%@"
 	/// IF USE_SCREEN_POSITION_FRAGMENT
 				float4 screenPosition;
 	///
+	/// IF USE_WORLD_POSITION_FRAGMENT
+				float3 worldPos;
+	///
+	/// IF USE_WORLD_NORMAL_FRAGMENT
+				float3 worldNormal;
+	///
+	/// IF USE_OBJECT_POSITION_FRAGMENT
+				float3 objPos;
+	///
+	/// IF USE_OBJECT_NORMAL_FRAGMENT
+				float3 objNormal;
+	///
 				[[MODULE:INPUT]]
 #END
+				[[INJECTION_POINT:Silhouette Pass/Varyings]]
 			};
-
-			[[VARIABLES]]
-			[[VARIABLES_GPU_INSTANCING]]
 
 #INPUT = v
 #OUTPUT = output
@@ -923,8 +1112,13 @@ Shader "@%SHADER_NAME%@"
 				UNITY_SETUP_INSTANCE_ID(v);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
+				[[INJECTION_POINT:Silhouette Pass/Vertex Shader/Start]]
+
 /// IF USE_WORLD_POSITION_UV_VERTEX
 				float3 worldPosUv = mul(unity_ObjectToWorld, v.vertex).xyz;
+///
+/// IF USE_WORLD_NORMAL_UV_VERTEX || USE_WORLD_NORMAL_FRAGMENT
+				float3 worldNormalUv = mul(unity_ObjectToWorld, float4(v.normal, 1.0)).xyz;
 ///
 				[[VERTEX_TEXCOORDS]]
 				[[SAMPLE_CUSTOM_PROPERTIES]]
@@ -933,16 +1127,33 @@ Shader "@%SHADER_NAME%@"
 				[[MODULE:VERTEX:VertExmotion(v.vertex, v.normal, v.tangent)]]
 				[[MODULE:VERTEX:CurvedWorld(v.vertex, v.normal, v.tangent)]]
 
+				[[MODULE:VERTEX:Vertex Displacement(v.vertex)]]
 	/// IF HOOK_VERTEX_POSITION
 				v.vertex.xyz = [[SAMPLE_VALUE_SHADER_PROPERTY:Vertex Position]];
 	///
+	/// IF HOOK_VERTEX_POSITION_WORLD || APPLY_WORLD_POSITION || USE_WORLD_POSITION_FRAGMENT || USE_WORLD_POSITION_VERTEX
 				float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+	///
+				[[MODULE:VERTEX:Vertex Displacement:WORLD(worldPos)]]
 	/// IF HOOK_VERTEX_POSITION_WORLD
 				worldPos.xyz = [[SAMPLE_VALUE_SHADER_PROPERTY:Vertex Position World]];
 	///
 				[[MODULE:VERTEX:Wind(worldPos.xyz)]]
 	/// IF APPLY_WORLD_POSITION
 				v.vertex.xyz = mul(unity_WorldToObject, float4(worldPos, 1)).xyz;
+	///
+				[[MODULE:VERTEX:Water(v.vertex, worldPos, v.normal)]]
+	/// IF USE_OBJECT_POSITION_FRAGMENT
+				output.[[INPUT_VALUE:objPos]] = v.vertex.xyz;
+	///
+	/// IF USE_OBJECT_NORMAL_FRAGMENT
+				output.[[INPUT_VALUE:objNormal]] = v.normal.xyz;
+	///
+	/// IF USE_WORLD_POSITION_FRAGMENT
+				output.[[INPUT_VALUE:worldPos]] = worldPos;
+	///
+	/// IF USE_WORLD_NORMAL_FRAGMENT
+				output.[[INPUT_VALUE:worldNormal]] = worldNormalUv;
 	///
 				output.vertex = UnityObjectToClipPos(v.vertex);
 	/// IF USE_VERTEX_COLORS_FRAG
@@ -959,7 +1170,11 @@ Shader "@%SHADER_NAME%@"
 				output.screenPosition = screenPos;
 		///
 	///
+				[[MODULE:VERTEX:Depth Texture(output.screenPosition, clipPos)]]
 				[[MODULE:VERTEX:Screen Space UV(screenPos, clipPos, output)]]
+
+				[[INJECTION_POINT:Silhouette Pass/Vertex Shader/End]]
+
 				return output;
 			}
 
@@ -968,9 +1183,14 @@ Shader "@%SHADER_NAME%@"
 #FRAGMENT
 			half4 fragment_silhouette (v2f_sil input) : SV_Target
 			{
+				[[INJECTION_POINT:Silhouette Pass/Fragment Shader/Start]]
+
 				[[MODULE:FRAGMENT:Screen Space UV(input.screenPosition, input)]]
 				[[SAMPLE_CUSTOM_PROPERTIES]]
 				[[SAMPLE_SHADER_PROPERTIES]]
+
+				[[INJECTION_POINT:Silhouette Pass/Fragment Shader/End]]
+
 				return [[VALUE:Silhouette Color]];
 			}
 			ENDCG
@@ -979,7 +1199,11 @@ Shader "@%SHADER_NAME%@"
 ///
 #PASS
 		// Main Surface Shader
-/// IF ALPHA_BLENDING
+/// IF AUTO_TRANSPARENT_BLENDING
+		Blend [_SrcBlend] [_DstBlend]
+		Cull [_Cull]
+		ZWrite [_ZWrite]
+/// ELIF ALPHA_BLENDING
 		Blend SrcAlpha OneMinusSrcAlpha
 /// ELIF ALPHA_BLENDING_PREMULT
 		Blend One OneMinusSrcAlpha
@@ -996,15 +1220,16 @@ Shader "@%SHADER_NAME%@"
 /// IF ALPHA_TESTING && ALPHA_TO_COVERAGE
 		AlphaToMask On
 ///
-/// IF ZWRITE
+/// IF ZWRITE && !AUTO_TRANSPARENT_BLENDING
 		ZWrite [[VALUE:Depth Write]]
 ///
 /// IF ZTEST
 		ZTest [[VALUE:Depth Test]]
 ///
-/// IF CULLING
+/// IF CULLING && !AUTO_TRANSPARENT_BLENDING
 		Cull [[VALUE:Face Culling]]
 ///
+		[[INJECTION_POINT:Main Pass/Shader States]]
 /// IF STENCIL
 
 		Stencil
@@ -1028,13 +1253,15 @@ Shader "@%SHADER_NAME%@"
 			FailBack [[VALUE:Stencil Back Fail]]
 			ZFailBack [[VALUE:Stencil Back Depth Fail]]
 	///
+			[[INJECTION_POINT:Main Pass/Stencil]]
 		}
 ///
 
 		CGPROGRAM
 
-		#pragma surface surf ToonyColorsCustom vertex:vertex_surface exclude_path:deferred exclude_path:prepass keepalpha @%SURF_PARAMS%@
+		#pragma surface surf ToonyColorsCustom vertex:vertex_surface exclude_path:deferred exclude_path:prepass keepalpha @%FLAGS:pragma_surface_shader%@
 		#pragma target @%SHADER_TARGET%@
+		[[INJECTION_POINT:Main Pass/Pragma]]
 
 	#if_not_empty
 		//================================================================
@@ -1042,12 +1269,16 @@ Shader "@%SHADER_NAME%@"
 
 	#start_not_empty_block
 		[[MODULE:SHADER_FEATURES_BLOCK:Specular]]
+		[[MODULE:SHADER_FEATURES_BLOCK:Vertex Displacement]]
 		[[MODULE:SHADER_FEATURES_BLOCK:Rim Lighting]]
-/// IF (GLOSSY_REFLECTIONS || REFLECTION_CUBEMAP) && REFLECTION_SHADER_FEATURE
+/// IF (GLOSSY_REFLECTIONS || REFLECTION_CUBEMAP || PLANAR_REFLECTION) && REFLECTION_SHADER_FEATURE
 		#pragma shader_feature TCP2_REFLECTIONS
 ///
 /// IF AMBIENT_SHADER_FEATURE
 		#pragma shader_feature TCP2_AMBIENT
+///
+/// IF AUTO_TRANSPARENT_BLENDING
+		#pragma shader_feature _ _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
 ///
 		[[MODULE:SHADER_FEATURES_BLOCK:MatCap]]
 		[[MODULE:SHADER_FEATURES_BLOCK:Subsurface Scattering]]
@@ -1055,18 +1286,22 @@ Shader "@%SHADER_NAME%@"
 		[[MODULE:SHADER_FEATURES_BLOCK:Sketch]]
 		[[MODULE:SHADER_FEATURES_BLOCK:NdotL Stylization]]
 		[[MODULE:SHADER_FEATURES_BLOCK:Wind]]
+		[[MODULE:SHADER_FEATURES_BLOCK:Water]]
 		[[MODULE:SHADER_FEATURES_BLOCK:Dissolve]]
 		[[MODULE:SHADER_FEATURES_BLOCK:Vertical Fog]]
 		[[MODULE:SHADER_FEATURES_BLOCK:Aura2]]
 	#end_not_empty_block
 	#end_not_empty
 
-		//================================================================
-		// VARIABLES
+	#if_not_empty
+		// Curved World 2020
+	#start_not_empty_block
+		[[MODULE:SHADER_FEATURES_BLOCK:CurvedWorld]]
+	#end_not_empty_block
+	#end_not_empty
 
-		[[VARIABLES]]
-		[[MODULE:VARIABLES]]
-		[[VARIABLES_GPU_INSTANCING]]
+		//================================================================
+		// STRUCTS
 
 		//Vertex input
 		struct appdata_tcp2
@@ -1084,6 +1319,7 @@ Shader "@%SHADER_NAME%@"
 /// IF USE_VERTEX_COLORS_VERT
 			fixed4 vertexColor : COLOR;
 ///
+			[[INJECTION_POINT:Main Pass/Attributes]]
 			UNITY_VERTEX_INPUT_INSTANCE_ID
 		};
 
@@ -1112,18 +1348,25 @@ Shader "@%SHADER_NAME%@"
 ///
 /// IF USE_WORLD_NORMAL_FRAGMENT
 			half3 worldNormal; INTERNAL_DATA
-	/// IF USE_WORLD_NORMAL_FRAGMENT_PER_VERTEX
+///
+/// IF USE_WORLD_NORMAL_FRAGMENT_PER_VERTEX
 			half3 worldNormalVertex;
-	///
 ///
 /// IF USE_SCREEN_POSITION_FRAGMENT
 			float4 screenPosition;
+///
+/// IF UV_SINE_ANIMATION_FRAGMENT
+			float2 sinUvAnimVertexPos;
+///
+/// IF UV_SINE_ANIMATION_FRAGMENT_WORLD
+			float2 sinUvAnimVertexWorldPos;
 ///
 /// IF USE_VFACE
 			float vFace : VFACE;
 ///
 			[[MODULE:INPUT]]
 			[[INPUT_STRUCT]]
+			[[INJECTION_POINT:Main Pass/Surface Input]]
 		};
 
 		//================================================================
@@ -1134,9 +1377,31 @@ Shader "@%SHADER_NAME%@"
 		{
 			UNITY_INITIALIZE_OUTPUT(Input, output);
 
+			[[INJECTION_POINT:Main Pass/Vertex Shader/Start]]
+
 /// IF USE_WORLD_POSITION_UV_VERTEX
 			float3 worldPosUv = mul(unity_ObjectToWorld, v.vertex).xyz;
 ///
+/// IF USE_WORLD_NORMAL_UV_VERTEX
+			float3 worldNormalUv = mul(unity_ObjectToWorld, float4(v.normal, 1.0)).xyz;
+///
+/// IF UV_SINE_ANIMATION_VERTEX
+
+			// Used for texture UV sine animation
+			float2 sinUvAnimVertexPos = v.vertex.xy + v.vertex.yz;
+	/// IF UV_SINE_ANIMATION_FRAGMENT
+			output.sinUvAnimVertexPos = sinUvAnimVertexPos;
+	///
+///
+/// IF UV_SINE_ANIMATION_VERTEX_WORLD
+
+			// Used for texture UV sine animation (world space)
+			float2 sinUvAnimVertexWorldPos = worldPosUv.xy + worldPosUv.yz;
+	/// IF UV_SINE_ANIMATION_FRAGMENT_WORLD
+			output.sinUvAnimVertexWorldPos = sinUvAnimVertexWorldPos;
+	///
+///
+
 			[[VERTEX_TEXCOORDS]]
 			[[SAMPLE_CUSTOM_PROPERTIES]]
 			[[SAMPLE_SHADER_PROPERTIES]]
@@ -1145,10 +1410,14 @@ Shader "@%SHADER_NAME%@"
 			[[MODULE:VERTEX:CurvedWorld(v.vertex, v.normal, v.tangent)]]
 			[[MODULE:VERTEX:Aura2(v.vertex, output)]]
 
+			[[MODULE:VERTEX:Vertex Displacement(v.vertex)]]
 /// IF HOOK_VERTEX_POSITION
 			v.vertex.xyz = [[SAMPLE_VALUE_SHADER_PROPERTY:Vertex Position]];
 ///
+/// IF HOOK_VERTEX_POSITION_WORLD || APPLY_WORLD_POSITION || (USE_VIEW_DIRECTION_VERTEX || USE_VIEW_DIRECTION_FRAGMENT_PER_VERTEX) ||  USE_WORLD_POSITION_VERTEX
 			float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+///
+			[[MODULE:VERTEX:Vertex Displacement:WORLD(worldPos)]]
 /// IF HOOK_VERTEX_POSITION_WORLD
 			worldPos.xyz = [[SAMPLE_VALUE_SHADER_PROPERTY:Vertex Position World]];
 ///
@@ -1156,6 +1425,7 @@ Shader "@%SHADER_NAME%@"
 /// IF APPLY_WORLD_POSITION
 			v.vertex.xyz = mul(unity_WorldToObject, float4(worldPos, 1)).xyz;
 ///
+			[[MODULE:VERTEX:Water(v.vertex, worldPos, v.normal)]]
 /// IF USE_OBJECT_POSITION_FRAGMENT
 			output.objPos = v.vertex.xyz;
 ///
@@ -1173,6 +1443,7 @@ Shader "@%SHADER_NAME%@"
 			output.screenPosition = screenPos;
 	///
 ///
+			[[MODULE:VERTEX:Depth Texture(output.screenPosition, clipPos)]]
 			[[MODULE:VERTEX:Screen Space UV(screenPos, clipPos, output)]]
 /// IF USE_VERTEX_COLORS_FRAG
 			output.vertexColor = v.vertexColor;
@@ -1183,12 +1454,12 @@ Shader "@%SHADER_NAME%@"
 			output.viewDirVertex = viewDir;
 	///
 ///
-/// IF USE_WORLD_NORMAL_VERTEX || (USE_WORLD_NORMAL_FRAGMENT && USE_WORLD_NORMAL_FRAGMENT_PER_VERTEX)
+/// IF USE_WORLD_NORMAL_VERTEX || USE_WORLD_NORMAL_FRAGMENT_PER_VERTEX
 			half3 worldNormal = UnityObjectToWorldNormal(v.normal);
 ///
 #ENABLE_IMPL: float ndv, lbl = "Special/N·V (Vertex)", help = "The dot product between the normal and view direction.", toggles = "USE_NDV_VERTEX", options = "(Use Min/Max Properties,USE_NDV_MIN_MAX_VERT,config),(Invert,USE_NDV_INVERT_VERT)"
 /// IF USE_NDV_VERTEX
-			half ndv = max(0, dot(viewDir, worldNormal));
+			half ndv = abs(dot(viewDir, worldNormal));
 			half ndvRaw = ndv;
 	/// IF USE_NDV_INVERT_VERT
 			ndv = 1 - ndv;
@@ -1206,6 +1477,8 @@ Shader "@%SHADER_NAME%@"
 ///
 			[[MODULE:VERTEX:Rim Lighting(ndvRaw, viewDir, v.normal, output)]]
 			[[MODULE:VERTEX:MatCap(v.normal, screenPos, output)]]
+
+			[[INJECTION_POINT:Main Pass/Vertex Shader/End]]
 #DISABLE_IMPL_ALL
 		}
 
@@ -1218,7 +1491,7 @@ Shader "@%SHADER_NAME%@"
 			half3 Albedo;
 			half3 Normal;
 /// IF USE_SURFACE_CUSTOM_NORMAL
-			half3 NormalCustom;
+			half4 NormalCustom;
 ///
 /// IF USE_WORLD_NORMAL_FRAGMENT
 			half3 worldNormal;
@@ -1231,6 +1504,9 @@ Shader "@%SHADER_NAME%@"
 			half ndv;
 			half ndvRaw;
 ///
+/// IF BUMP
+			float3 normalTS;
+///
 
 			Input input;
 			[[VARIABLES_SURFACE_OUTPUT]]
@@ -1242,13 +1518,30 @@ Shader "@%SHADER_NAME%@"
 #FRAGMENT, INPUT = input, OUTPUT = output
 		void surf(Input input, inout SurfaceOutputCustom output)
 		{
-#ENABLE_IMPL: float input.vFace, lbl = "Special/VFACE (Face direction)", help = "Indicates if the current face is back or front-facing. Should be used with custom Face Culling.", toggles = "USE_VFACE", custom_code_compatible = true
-/// IF BUMP && BUMP_SHADER_FEATURE
-			#if defined(_NORMALMAP)
+			[[INJECTION_POINT:Main Pass/Surface Function/Start]]
+			[[FRAGMENT_TEXCOORDS]]
+/// IF BUMP && USE_WORLD_NORMAL_FRAGMENT && !WORLD_NORMAL_FROM_BUMP
+
+			input.worldNormal = WorldNormalVector(input, output.Normal);
+
 ///
+#ENABLE_IMPL: float input.vFace, lbl = "Special/VFACE (Face direction)", help = "Indicates if the current face is back or front-facing. Should be used with custom Face Culling.", toggles = "USE_VFACE", custom_code_compatible = true
+/// IF BUMP && (PARALLAX || WORLD_NORMAL_FROM_BUMP)
+	/// IF BUMP_SHADER_FEATURE
+			#if defined(_NORMALMAP)
+	///
 			[[MODULE:FRAGMENT:Normal Mapping:PARALLAX_SURFACE(input.viewDir, input.texcoord0)]]
-/// IF BUMP && BUMP_SHADER_FEATURE
+	/// IF WORLD_NORMAL_FROM_BUMP
+			half4 normalMap = half4(0,0,0,0);
+			[[MODULE:FRAGMENT:Normal Mapping:BUMP_SAMPLE_BEFORE(output.Normal)]]
+		/// IF USE_WORLD_NORMAL_FRAGMENT
+			input.worldNormal = WorldNormalVector(input, output.Normal);
+		///
+	///
+	/// IF BUMP_SHADER_FEATURE
 			#endif
+
+	///
 ///
 			[[MODULE:FRAGMENT:Screen Space UV(input.screenPosition, input)]]
 			[[SAMPLE_CUSTOM_PROPERTIES]]
@@ -1256,26 +1549,33 @@ Shader "@%SHADER_NAME%@"
 			output.input = input;
 
 			[[MODULE:FRAGMENT:Texture Blending:INIT_UVS]]
-/// IF BUMP && BUMP_SHADER_FEATURE
+/// IF BUMP
+	/// IF BUMP_SHADER_FEATURE
 			#if defined(_NORMALMAP)
-///
+	///
+	/// IF !WORLD_NORMAL_FROM_BUMP
+			half4 normalMap = half4(0,0,0,0);
+	///
 			[[MODULE:FRAGMENT:Normal Mapping:BUMP_SAMPLE()]]
 			[[MODULE:FRAGMENT:Texture Blending:BUMP(normalMap)]]
-			[[MODULE:FRAGMENT:Normal Mapping:UNPACK_BUMP_SURFACE(output.Normal, normalMap)]]
-/// IF BUMP && BUMP_SHADER_FEATURE
+			[[MODULE:FRAGMENT:Normal Mapping:UNPACK_BUMP_SURFACE(output.Normal, normalMap, output.normalTS)]]
+
+	/// IF BUMP_SHADER_FEATURE
 			#endif
+
+	///
 ///
-		/// IF USE_WORLD_NORMAL_FRAGMENT
+/// IF USE_WORLD_NORMAL_FRAGMENT
 			half3 worldNormal = WorldNormalVector(input, output.Normal);
 			output.worldNormal = worldNormal;
-		///
+///
 
 #ENABLE_IMPL: float ndv, lbl = "Special/N·V", help = "The dot product between the normal and view direction.", toggles = "USE_NDV_FRAGMENT", options = "(Use Min/Max Properties,USE_NDV_MIN_MAX_FRAG,config),(Invert,USE_NDV_INVERT_FRAG),(Ignore Normal Map,USE_NDV_IGNORE_NORMAL_MAP)"
 /// IF USE_NDV_FRAGMENT
 	/// IF USE_NDV_IGNORE_NORMAL_MAP && BUMP
-			half ndv = max(0, dot(input.viewDirVertex, input.worldNormalVertex.xyz));
+			half ndv = abs(dot(input.viewDirVertex, input.worldNormalVertex.xyz));
 	/// ELSE
-			half ndv = max(0, dot(input.viewDir, output.Normal.xyz));
+			half ndv = abs(dot(input.viewDir, normalize(output.Normal.xyz)));
 	///
 			half ndvRaw = ndv;
 	/// IF USE_NDV_INVERT_FRAG
@@ -1288,6 +1588,8 @@ Shader "@%SHADER_NAME%@"
 			output.ndvRaw = ndvRaw;
 
 ///
+			[[MODULE:FRAGMENT:Depth Texture(input.screenPosition, positionNDC)]]
+
 		/// IF CUSTOM_ALBEDO
 			output.Albedo = half3(1,1,1);
 			output.Alpha = 1;
@@ -1308,13 +1610,15 @@ Shader "@%SHADER_NAME%@"
 		///
 /// IF TEXTURE_BLENDING || TRIPLANAR
 			half4 albedoAlpha = half4(output.Albedo, output.Alpha);
-			[[MODULE:FRAGMENT:Triplanar:INPUT(input.worldPos, worldNormal, input.objPos, input.objNormal)]]
-			[[MODULE:FRAGMENT:Triplanar(albedoAlpha, input.worldPos, input.objPos)]]
+			[[MODULE:FRAGMENT:Triplanar:INPUT(input.worldPos, input.worldNormalVertex, input.objPos, input.objNormal)]]
+			[[MODULE:FRAGMENT:Triplanar:SAMPLE_GROUND(albedoAlpha, input.objPos)]]
 			[[MODULE:FRAGMENT:Texture Blending(albedoAlpha)]]
+			[[MODULE:FRAGMENT:Triplanar(albedoAlpha, input.worldPos, input.objPos)]]
 			output.Albedo = albedoAlpha.rgb;
 ///
 			[[MODULE:FRAGMENT:AlbedoHSV(output.Albedo)]]
 			output.Albedo *= [[VALUE:Main Color]].rgb;
+			[[MODULE:FRAGMENT:Water(output.Albedo, output.Alpha)]]
 /// IF HOOK_FINAL_ALBEDO
 			output.Albedo.rgb = [[SAMPLE_VALUE_SHADER_PROPERTY:Final Albedo]];
 ///
@@ -1324,6 +1628,7 @@ Shader "@%SHADER_NAME%@"
 			[[MODULE:FRAGMENT:Triplanar:BUMP(output.NormalCustom)]]
 			[[MODULE:FRAGMENT:MatCap(output.Albedo, output.Emission, worldNormal, input)]]
 #DISABLE_IMPL_ALL
+			[[INJECTION_POINT:Main Pass/Surface Function/End]]
 		}
 
 		//================================================================
@@ -1336,6 +1641,7 @@ Shader "@%SHADER_NAME%@"
 		inline half4 LightingToonyColorsCustom(inout SurfaceOutputCustom surface, UnityGI gi)
 ///
 		{
+			[[INJECTION_POINT:Main Pass/Lighting Function/Start]]
 #ENABLE_IMPL: float3 viewDir, lbl = "Special/View Direction", help = "The world space view direction vector.", toggles = "USE_VIEW_DIRECTION_FRAGMENT"
 #ENABLE_IMPL: float surface.input.vFace, lbl = "Special/VFACE (Face direction)", help = "Indicates if the current face is back or front-facing. Should be used with custom Face Culling.", toggles = "USE_VFACE", custom_code_compatible = false
 #ENABLE_IMPL: float3 _LightColor0, lbl = "Special/Light Color", compat = "all", help = "The color of the current light used."
@@ -1345,7 +1651,7 @@ Shader "@%SHADER_NAME%@"
 ///
 			half3 lightDir = gi.light.dir;
 /// IF HOOK_MAIN_LIGHT_DIR
-			#if defined(UNITY_PASS_FORWARDBASE)
+			#if !defined(UNITY_PASS_FORWARDADD)
 				lightDir = normalize([[SAMPLE_VALUE_SHADER_PROPERTY:Main Light Direction]]);
 			#endif
 ///
@@ -1363,7 +1669,7 @@ Shader "@%SHADER_NAME%@"
 				half atten = max(gi.light.color.r, max(gi.light.color.g, gi.light.color.b)) / max(_LightColor0.r, max(_LightColor0.g, _LightColor0.b));
 			#endif
 /// IF HOOK_MAIN_LIGHT_COLOR
-			#if defined(UNITY_PASS_FORWARDBASE)
+			#if !defined(UNITY_PASS_FORWARDADD)
 				lightColor = [[SAMPLE_VALUE_SHADER_PROPERTY:Main Light Color]];
 			#endif
 ///
@@ -1373,7 +1679,7 @@ Shader "@%SHADER_NAME%@"
 			#endif
 ///
 /// IF HOOK_MAIN_LIGHT_ATTEN
-			#if defined(UNITY_PASS_FORWARDBASE)
+			#if !defined(UNITY_PASS_FORWARDADD)
 				atten = [[SAMPLE_VALUE_SHADER_PROPERTY:Main Light Attenuation]];
 			#endif
 ///
@@ -1385,7 +1691,11 @@ Shader "@%SHADER_NAME%@"
 #ENABLE_IMPL: float atten, lbl = "Special/Shadow Map", compat = "all", help = "The shadow map value for the current light."
 
 /// IF USE_SURFACE_CUSTOM_NORMAL
-			half3 normal = surface.NormalCustom;
+	/// IF BUMP
+			half3 normal = lerp(surface.NormalCustom.xyz, surface.Normal, surface.NormalCustom.w);
+	/// ELSE
+			half3 normal = surface.NormalCustom.xyz;
+	///
 /// ELSE
 			half3 normal = normalize(surface.Normal);
 ///
@@ -1397,15 +1707,29 @@ Shader "@%SHADER_NAME%@"
 			half ndl = dot(normal, lightDir);
 #ENABLE_IMPL: float ndl, lbl = "Special/N·L", compat = "all", help = "The dot product between the normal and light direction."
 			[[MODULE:FRAGMENT:NdotL Stylization:AFTER_NDL(ndl)]]
+/// IF ATTEN_AT_NDL
+			//Apply attenuation (shadowmaps & point/spot lights attenuation)
+			ndl *= atten;
+///
 			half3 ramp;
 			[[MODULE:FRAGMENT:Ramp Shading(ramp, ndl)]]
+/// IF USE_NDL_GRAYSCALE
 			half3 rampGrayscale = ramp;
-#ENABLE_IMPL: float3 rampGrayscale, lbl = "Special/N·L Ramp (Black and White)", compat = "all", help = "N·L with the ramp modification before the highlight/shadow colors are applied."
+///
+#ENABLE_IMPL: float3 rampGrayscale, lbl = "Special/N·L Ramp (Black and White)", compat = "all", toggles = "USE_NDL_GRAYSCALE", help = "N·L with the ramp modification before the highlight/shadow colors are applied."
 
+/// IF NO_RAMP_UNLIT
+			#if !defined(UNITY_PASS_FORWARDBASE)
+///
+/// IF !ATTEN_AT_NDL
 			//Apply attenuation (shadowmaps & point/spot lights attenuation)
 			ramp *= atten;
+///
 			[[MODULE:FRAGMENT:ShadowHSV(surface.Albedo, ramp)]]
 			[[MODULE:FRAGMENT:Sketch(ramp)]]
+/// IF NO_RAMP_UNLIT
+			#endif
+///
 
 			//Highlight/Shadow Colors
 /// IF SHADOW_COLOR_LERP
@@ -1428,7 +1752,11 @@ Shader "@%SHADER_NAME%@"
 
 			//Output color
 			half4 color;
+/// IF NO_RAMP_UNLIT
+			color.rgb = surface.Albedo * ramp;
+/// ELSE
 			color.rgb = surface.Albedo * lightColor.rgb * ramp;
+///
 			color.a = surface.Alpha;
 			[[MODULE:FRAGMENT:Sketch:APPLY(color.rgb)]]
 
@@ -1455,21 +1783,30 @@ Shader "@%SHADER_NAME%@"
 			#endif
 ///
 			#endif
+
+			[[MODULE:FRAGMENT:Subsurface Scattering(color, normal, viewDir, surface.Albedo, lightColor, lightDir, atten)]]
+/// IF AUTO_TRANSPARENT_BLENDING
+			// Premultiply blending
+			#if defined(_ALPHAPREMULTIPLY_ON)
+				color.rgb *= color.a;
+			#endif
+///
+
 			[[MODULE:FRAGMENT:Specular(color, normal, surface.input.tangent, lightDir, viewDir, ndl, surface.ndvRaw, atten)]]
 			[[MODULE:FRAGMENT:Rim Lighting(surface.ndvRaw, color, color, normal, viewDir, surface.input.screenPosition, ndl, atten, surface.input)]]
-			[[MODULE:FRAGMENT:Subsurface Scattering(color, normal, viewDir, surface.Albedo, lightColor, lightDir, atten)]]
 	#if_not_empty
 			// ForwardBase pass only
-			#if !defined(UNITY_PASS_FORWARADD)
+			#if !defined(UNITY_PASS_FORWARDADD)
 	#start_not_empty_block
 /// IF GLOSSY_REFLECTIONS
 
 	/// IF GLOSSY_REFLECTIONS && REFLECTION_SHADER_FEATURE
 				#if defined(TCP2_REFLECTIONS)
 	///
-					//Reflection probes/skybox
-					half3 reflections = gi.indirect.specular * occlusion * [[VALUE:Reflection Color]];
-					[[MODULE:FRAGMENT:Reflection(reflections, surface.worldNormal, viewDir, surface.ndvRaw)]]
+					// Reflection probes/skybox
+					half3 reflections = gi.indirect.specular * occlusion;
+					[[MODULE:FRAGMENT:Reflection(reflections, surface.worldNormal, viewDir, surface.ndvRaw, surface.input.screenPosition, surface.normalTS)]]
+					reflections *= [[VALUE:Reflection Color]];
 					color.rgb += reflections;
 	/// IF GLOSSY_REFLECTIONS && REFLECTION_SHADER_FEATURE
 				#endif
@@ -1479,8 +1816,11 @@ Shader "@%SHADER_NAME%@"
 
 			half3 reflections = half3(0, 0, 0);
 	#start_not_empty_block
-			[[MODULE:FRAGMENT:Reflection(reflections, surface.worldNormal, viewDir, surface.ndvRaw)]]
+			[[MODULE:FRAGMENT:Reflection(reflections, surface.worldNormal, viewDir, surface.ndvRaw, surface.input.screenPosition, surface.normalTS)]]
 	#end_not_empty_block
+	/// IF PLANAR_REFLECTION
+			reflections *= [[VALUE:Reflection Color]];
+	///
 			color.rgb += reflections;
 	#end_not_empty
 ///
@@ -1495,14 +1835,111 @@ Shader "@%SHADER_NAME%@"
 			#endif
 	#end_not_empty
 			[[MODULE:FRAGMENT:Vertical Fog(color.rgb, surface.input.worldPos)]]
+			[[INJECTION_POINT:Main Pass/Lighting Function/End]]
 #DISABLE_IMPL_ALL
+
+/// IF AUTO_TRANSPARENT_BLENDING
+			// Apply alpha to Forward Add passes
+			#if defined(_ALPHABLEND_ON) && defined(UNITY_PASS_FORWARDADD)
+				color.rgb *= color.a;
+			#endif
+///
+
 			return color;
 		}
 
+/// IF ENABLE_LIGHTMAPS
+		// Same as UnityGI_Base but with attenuation extraction that works with lightmaps
+		inline UnityGI UnityGI_Base_TCP2(UnityGIInput data, half occlusion, half3 normalWorld, out half tcp2_atten)
+		{
+			UnityGI o_gi;
+			ResetUnityGI(o_gi);
+
+			// Base pass with Lightmap support is responsible for handling ShadowMask / blending here for performance reason
+			#if defined(HANDLE_SHADOWS_BLENDING_IN_GI)
+				half bakedAtten = UnitySampleBakedOcclusion(data.lightmapUV.xy, data.worldPos);
+				float zDist = dot(_WorldSpaceCameraPos - data.worldPos, UNITY_MATRIX_V[2].xyz);
+				float fadeDist = UnityComputeShadowFadeDistance(data.worldPos, zDist);
+				data.atten = UnityMixRealtimeAndBakedShadows(data.atten, bakedAtten, UnityComputeShadowFade(fadeDist));
+			#endif
+
+			o_gi.light = data.light;
+
+			// TCP2: don't apply attenuation to light color
+			// o_gi.light.color *= data.atten;
+
+			// TCP2: extract attenuation
+			tcp2_atten = data.atten;
+
+			#if UNITY_SHOULD_SAMPLE_SH
+				o_gi.indirect.diffuse = ShadeSHPerPixel(normalWorld, data.ambient, data.worldPos);
+			#endif
+
+			#if defined(LIGHTMAP_ON)
+				// Baked lightmaps
+				half4 bakedColorTex = UNITY_SAMPLE_TEX2D(unity_Lightmap, data.lightmapUV.xy);
+				half3 bakedColor = DecodeLightmap(bakedColorTex);
+
+				#ifdef DIRLIGHTMAP_COMBINED
+					fixed4 bakedDirTex = UNITY_SAMPLE_TEX2D_SAMPLER (unity_LightmapInd, unity_Lightmap, data.lightmapUV.xy);
+					o_gi.indirect.diffuse += DecodeDirectionalLightmap (bakedColor, bakedDirTex, normalWorld);
+
+					#if defined(LIGHTMAP_SHADOW_MIXING) && !defined(SHADOWS_SHADOWMASK) && defined(SHADOWS_SCREEN)
+						ResetUnityLight(o_gi.light);
+						o_gi.indirect.diffuse = SubtractMainLightWithRealtimeAttenuationFromLightmap (o_gi.indirect.diffuse, data.atten, bakedColorTex, normalWorld);
+					#endif
+
+				#else // not directional lightmap
+					o_gi.indirect.diffuse += bakedColor;
+
+					#if defined(LIGHTMAP_SHADOW_MIXING) && !defined(SHADOWS_SHADOWMASK) && defined(SHADOWS_SCREEN)
+						ResetUnityLight(o_gi.light);
+						o_gi.indirect.diffuse = SubtractMainLightWithRealtimeAttenuationFromLightmap(o_gi.indirect.diffuse, data.atten, bakedColorTex, normalWorld);
+					#endif
+
+				#endif
+			#endif
+
+			#ifdef DYNAMICLIGHTMAP_ON
+				// Dynamic lightmaps
+				fixed4 realtimeColorTex = UNITY_SAMPLE_TEX2D(unity_DynamicLightmap, data.lightmapUV.zw);
+				half3 realtimeColor = DecodeRealtimeLightmap (realtimeColorTex);
+
+				#ifdef DIRLIGHTMAP_COMBINED
+					half4 realtimeDirTex = UNITY_SAMPLE_TEX2D_SAMPLER(unity_DynamicDirectionality, unity_DynamicLightmap, data.lightmapUV.zw);
+					o_gi.indirect.diffuse += DecodeDirectionalLightmap (realtimeColor, realtimeDirTex, normalWorld);
+				#else
+					o_gi.indirect.diffuse += realtimeColor;
+				#endif
+			#endif
+
+			o_gi.indirect.diffuse *= occlusion;
+			return o_gi;
+		}
+
+		inline UnityGI UnityGlobalIllumination_TCP2 (UnityGIInput data, half occlusion, half3 normalWorld, out half tcp2_atten)
+		{
+			return UnityGI_Base_TCP2(data, occlusion, normalWorld, tcp2_atten);
+		}
+
+		inline UnityGI UnityGlobalIllumination_TCP2 (UnityGIInput data, half occlusion, half3 normalWorld, Unity_GlossyEnvironmentData glossIn, out half tcp2_atten)
+		{
+			UnityGI o_gi = UnityGI_Base_TCP2(data, occlusion, normalWorld, tcp2_atten);
+			o_gi.indirect.specular = UnityGI_IndirectSpecular(data, occlusion, glossIn);
+			return o_gi;
+		}
+
+///
+
 		void LightingToonyColorsCustom_GI(inout SurfaceOutputCustom surface, UnityGIInput data, inout UnityGI gi)
 		{
+			[[INJECTION_POINT:Main Pass/GI Function/Start]]
 /// IF USE_SURFACE_CUSTOM_NORMAL
-			half3 normal = surface.NormalCustom;
+	/// IF BUMP
+			half3 normal = lerp(surface.NormalCustom.xyz, surface.Normal, surface.NormalCustom.w);
+	/// ELSE
+			half3 normal = surface.NormalCustom.xyz;
+	///
 /// ELSE
 			half3 normal = surface.Normal;
 ///
@@ -1514,19 +1951,40 @@ Shader "@%SHADER_NAME%@"
 			//GI with reflection probes support
 			half smoothness = [[VALUE:Reflection Smoothness]];
 			Unity_GlossyEnvironmentData g = UnityGlossyEnvironmentSetup(smoothness, data.worldViewDir, normal, half3(0,0,0));	// last parameter is actually unused
+	/// IF ENABLE_LIGHTMAPS
+			half tcp2_atten;
+			gi = UnityGlobalIllumination_TCP2(data, 1.0, normal, g, tcp2_atten); // occlusion is applied in the lighting function, if necessary
+	/// ELSE
 			gi = UnityGlobalIllumination(data, 1.0, normal, g); // occlusion is applied in the lighting function, if necessary
+	///
 	/// IF REFLECTION_SHADER_FEATURE
 			#else
+	/// IF ENABLE_LIGHTMAPS
+			half tcp2_atten;
+			gi = UnityGlobalIllumination_TCP2(data, 1.0, normal, tcp2_atten); // occlusion is applied in the lighting function, if necessary
+	/// ELSE
 			gi = UnityGlobalIllumination(data, 1.0, normal); // occlusion is applied in the lighting function, if necessary
+	///
 			#endif
 	///
 /// ELSE
 			//GI without reflection probes
+	/// IF ENABLE_LIGHTMAPS
+			half tcp2_atten;
+			gi = UnityGlobalIllumination_TCP2(data, 1.0, normal, tcp2_atten); // occlusion is applied in the lighting function, if necessary
+	/// ELSE
 			gi = UnityGlobalIllumination(data, 1.0, normal); // occlusion is applied in the lighting function, if necessary
+	///
 ///
 
+/// IF ENABLE_LIGHTMAPS
+			surface.atten = tcp2_atten; // transfer attenuation to lighting function
+/// ELSE
 			surface.atten = data.atten; // transfer attenuation to lighting function
 			gi.light.color = _LightColor0.rgb; // remove attenuation
+///
+
+			[[INJECTION_POINT:Main Pass/GI Function/End]]
 		}
 
 		ENDCG
@@ -1536,7 +1994,11 @@ Shader "@%SHADER_NAME%@"
 		Pass
 		{
 			Name "Outline"
-			Tags { "LightMode"="ForwardBase" }
+			Tags
+			{
+				"LightMode"="ForwardBase"
+				[[INJECTION_POINT:Outline Pass/Tags]]
+			}
 			Cull Front
 	/// IF OUTLINE_ZSMOOTH
 			Offset [[VALUE:Outline Offset Factor]],[[VALUE:Outline Offset Units]]
@@ -1546,12 +2008,14 @@ Shader "@%SHADER_NAME%@"
 	/// ELIF OUTLINE_OPAQUE
 			Blend Off
 	///
+			[[INJECTION_POINT:Outline Pass/Shader States]]
 	/// IF OUTLINE_BEHIND_STENCIL
 			Stencil
 			{
 				Ref [[VALUE:Outline Stencil Reference]]
 				Comp NotEqual
 				Pass Keep
+				[[INJECTION_POINT:Outline Pass/Stencil]]
 			}
 	///
 
@@ -1562,6 +2026,8 @@ Shader "@%SHADER_NAME%@"
 			#pragma multi_compile _ TCP2_COLORS_AS_NORMALS TCP2_TANGENT_AS_NORMALS TCP2_UV1_AS_NORMALS TCP2_UV2_AS_NORMALS TCP2_UV3_AS_NORMALS TCP2_UV4_AS_NORMALS
 			#pragma multi_compile _ TCP2_UV_NORMALS_FULL TCP2_UV_NORMALS_ZW
 			#pragma multi_compile_instancing
+			[[GPU_INSTANCING_OPTIONS]]
+			[[MODULE:SHADER_FEATURES_BLOCK:Dissolve]]
 			ENDCG
 		}
 ///
@@ -1571,7 +2037,11 @@ Shader "@%SHADER_NAME%@"
 		Pass
 		{
 			Name "Outline Depth"
-			Tags { "LightMode"="ForwardBase" }
+			Tags
+			{
+				"LightMode"="ForwardBase"
+				[[INJECTION_POINT:Outline Depth Pass/Tags]]
+			}
 			Cull Off
 	/// IF OUTLINE_ZSMOOTH
 			Offset [[VALUE:Outline Offset Factor]],[[VALUE:Outline Offset Units]]
@@ -1581,12 +2051,15 @@ Shader "@%SHADER_NAME%@"
 			ColorMask 0
 			ZWrite On
 
+			[[INJECTION_POINT:Outline Depth Pass/Shader States]]
+
 			CGPROGRAM
 			#pragma vertex vertex_outline
 			#pragma fragment fragment_outline
 			#pragma multi_compile _ TCP2_COLORS_AS_NORMALS TCP2_TANGENT_AS_NORMALS TCP2_UV1_AS_NORMALS TCP2_UV2_AS_NORMALS TCP2_UV3_AS_NORMALS TCP2_UV4_AS_NORMALS
 			#pragma multi_compile _ TCP2_UV_NORMALS_FULL TCP2_UV_NORMALS_ZW
 			#pragma multi_compile_instancing
+			[[GPU_INSTANCING_OPTIONS]]
 			#pragma target @%SHADER_TARGET%@
 			ENDCG
 		}
@@ -1600,17 +2073,23 @@ Shader "@%SHADER_NAME%@"
 		Pass
 		{
 			Name "ShadowCaster"
-			Tags { "LightMode" = "ShadowCaster" }
+			Tags
+			{
+				"LightMode" = "ShadowCaster"
+				[[INJECTION_POINT:Shadow Caster Pass/Tags]]
+			}
+
+			[[INJECTION_POINT:Shadow Caster Pass/Shader States]]
 
 			CGPROGRAM
 
 			#define SHADOWCASTER_PASS
 
-			#include "UnityCG.cginc"
 			#pragma vertex vertex_shadowcaster
 			#pragma fragment fragment_shadowcaster
 			#pragma multi_compile_shadowcaster
 			#pragma multi_compile_instancing
+			[[GPU_INSTANCING_OPTIONS]]
 
 	/// IF OUTLINE && OUTLINE_SHADOWCASTER
 			#pragma multi_compile TCP2_NONE TCP2_ZSMOOTH_ON
@@ -1619,9 +2098,17 @@ Shader "@%SHADER_NAME%@"
 			#pragma multi_compile _ TCP2_UV_NORMALS_FULL TCP2_UV_NORMALS_ZW
 	///
 
-			[[VARIABLES]]
-			[[MODULE:VARIABLES]]
-			[[VARIABLES_GPU_INSTANCING]]
+		#if_not_empty
+			// Curved World 2020
+		#start_not_empty_block
+			[[MODULE:SHADER_FEATURES_BLOCK:CurvedWorld]]
+		#end_not_empty_block
+		#end_not_empty
+
+			[[MODULE:SHADER_FEATURES_BLOCK:Dissolve]]
+
+			[[INJECTION_POINT:Shadow Caster Pass/Pragma]]
+
 			// half _Cutoff;
 	/// IF (SHADER_BLENDING && DITHERED_SHADOWS) || (CUTOUT && CUTOUT_DITHER)
 			sampler3D	_DitherMaskLOD;
@@ -1650,6 +2137,7 @@ Shader "@%SHADER_NAME%@"
 	/// IF !USE_TANGENT_VERT && !USE_TANGENT_FRAGMENT && !VERTEXMOTION_NORMAL && !CURVED_WORLD_NORMAL
 			#endif
 	///
+				[[INJECTION_POINT:Shadow Caster Pass/Attributes]]
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
@@ -1665,8 +2153,21 @@ Shader "@%SHADER_NAME%@"
 	/// IF USE_SCREEN_POSITION_FRAGMENT
 				float4 screenPosition;
 	///
+	/// IF USE_WORLD_POSITION_FRAGMENT
+				float3 worldPos;
+	///
+	/// IF USE_WORLD_NORMAL_FRAGMENT
+				float3 worldNormal;
+	///
+	/// IF USE_OBJECT_POSITION_FRAGMENT
+				float3 objPos;
+	///
+	/// IF USE_OBJECT_NORMAL_FRAGMENT
+				float3 objNormal;
+	///
 				[[MODULE:INPUT:Outline]]
 #END
+				[[INJECTION_POINT:Shadow Caster Pass/Varyings]]
 			};
 
 #INPUT = v
@@ -1678,8 +2179,13 @@ Shader "@%SHADER_NAME%@"
 				UNITY_SETUP_INSTANCE_ID(v);
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
+				[[INJECTION_POINT:Shadow Caster Pass/Vertex Shader/Start]]
+
 /// IF USE_WORLD_POSITION_UV_VERTEX
 				float3 worldPosUv = mul(unity_ObjectToWorld, v.vertex).xyz;
+///
+/// IF USE_WORLD_NORMAL_UV_VERTEX || USE_WORLD_NORMAL_FRAGMENT
+				float3 worldNormalUv = mul(unity_ObjectToWorld, float4(v.normal, 1.0)).xyz;
 ///
 				[[VERTEX_TEXCOORDS]]
 				[[SAMPLE_CUSTOM_PROPERTIES]]
@@ -1688,16 +2194,33 @@ Shader "@%SHADER_NAME%@"
 				[[MODULE:VERTEX:VertExmotion(v.vertex, v.normal, v.tangent)]]
 				[[MODULE:VERTEX:CurvedWorld(v.vertex, v.normal, v.tangent)]]
 
+				[[MODULE:VERTEX:Vertex Displacement(v.vertex)]]
 	/// IF HOOK_VERTEX_POSITION
 				v.vertex.xyz = [[SAMPLE_VALUE_SHADER_PROPERTY:Vertex Position]];
 	///
-	/// IF HOOK_VERTEX_POSITION_WORLD
+	/// IF HOOK_VERTEX_POSITION_WORLD || APPLY_WORLD_POSITION || USE_WORLD_POSITION_FRAGMENT || USE_WORLD_POSITION_VERTEX
 				float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+	///
+				[[MODULE:VERTEX:Vertex Displacement:WORLD(worldPos)]]
+	/// IF HOOK_VERTEX_POSITION_WORLD
 				worldPos.xyz = [[SAMPLE_VALUE_SHADER_PROPERTY:Vertex Position World]];
 	///
 				[[MODULE:VERTEX:Wind(worldPos.xyz)]]
 	/// IF APPLY_WORLD_POSITION
 				v.vertex.xyz = mul(unity_WorldToObject, float4(worldPos, 1)).xyz;
+	///
+				[[MODULE:VERTEX:Water(v.vertex, worldPos, v.normal)]]
+	/// IF USE_OBJECT_POSITION_FRAGMENT
+				output.[[INPUT_VALUE:objPos]] = v.vertex.xyz;
+	///
+	/// IF USE_OBJECT_NORMAL_FRAGMENT
+				output.[[INPUT_VALUE:objNormal]] = v.normal.xyz;
+	///
+	/// IF USE_WORLD_POSITION_FRAGMENT
+				output.[[INPUT_VALUE:worldPos]] = worldPos;
+	///
+	/// IF USE_WORLD_NORMAL_FRAGMENT
+				output.[[INPUT_VALUE:worldNormal]] = worldNormalUv;
 	///
 	/// IF USE_VERTEX_COLORS_FRAG
 				output.vertexColor = v.vertexColor;
@@ -1715,6 +2238,9 @@ Shader "@%SHADER_NAME%@"
 				output.screenPosition = screenPos;
 		///
 	///
+				[[MODULE:VERTEX:Depth Texture(output.screenPosition, clipPos)]]
+
+				[[INJECTION_POINT:Shadow Caster Pass/Vertex Shader/End]]
 
 				TRANSFER_SHADOW_CASTER_NOPOS(output,opos)
 			}
@@ -1724,6 +2250,8 @@ Shader "@%SHADER_NAME%@"
 #FRAGMENT
 			half4 fragment_shadowcaster(v2f_shadowcaster input, UNITY_VPOS_TYPE vpos : VPOS) : SV_Target
 			{
+				[[INJECTION_POINT:Shadow Caster Pass/Fragment Shader/Start]]
+
 				[[MODULE:FRAGMENT:Screen Space UV(input.screenPosition, input)]]
 				[[SAMPLE_CUSTOM_PROPERTIES]]
 				[[SAMPLE_SHADER_PROPERTIES]]
@@ -1735,6 +2263,8 @@ Shader "@%SHADER_NAME%@"
 				clip (alphaRef - 0.01);
 
 	///
+				[[INJECTION_POINT:Shadow Caster Pass/Fragment Shader/End]]
+
 				SHADOW_CASTER_FRAGMENT(input)
 			}
 
@@ -1743,6 +2273,8 @@ Shader "@%SHADER_NAME%@"
 ///
 	}
 
+/// IF !USE_DEPTH_BUFFER
 	Fallback "Diffuse"
+///
 	CustomEditor "ToonyColorsPro.ShaderGenerator.MaterialInspector_SG2"
 }

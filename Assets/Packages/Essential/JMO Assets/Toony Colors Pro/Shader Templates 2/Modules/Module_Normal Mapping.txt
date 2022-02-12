@@ -1,5 +1,5 @@
 // Toony Colors Pro+Mobile 2
-// (c) 2014-2020 Jean Moreno
+// (c) 2014-2021 Jean Moreno
 
 // Shader Generator Module: Normal Mapping & Parallax
 // NOTE:  '#if defined(_NORMALMAP)' are inserted in the Template code directly
@@ -10,7 +10,7 @@
 sngl	lbl="Normal/Bump Map"			kw=BUMP			help="featuresreference/surface/normal/bumpmap"
 sngl	lbl="Bump Scale"				kw=BUMP_SCALE			needs=BUMP	indent
 sngl	lbl="Parallax/Height Map"		kw=PARALLAX				needs=BUMP	indent
-sngl	lbl="Make Optional"			kw=BUMP_SHADER_FEATURE		needs=BUMP	indent		tt="Will make normal mapping optional in the material inspector, using a shader keyword"
+sngl	lbl="Make Optional"				kw=BUMP_SHADER_FEATURE	needs=BUMP	indent		tt="Will make normal mapping optional in the material inspector, using a shader keyword"
 #END
 
 //================================================================
@@ -130,19 +130,40 @@ sngl	lbl="Make Optional"			kw=BUMP_SHADER_FEATURE		needs=BUMP	indent		tt="Will m
 // Version for surface shaders
 #LIGHTING:BUMP_SAMPLE
 /// IF BUMP
-
-	// Normal Mapping
-	half4 normalMap = [[VALUE:Normal Map]];
+	normalMap = [[VALUE:Normal Map]];
 ///
 #END
 
-#LIGHTING:UNPACK_BUMP_SURFACE(float3 outNormal, float4 normalMap)
+#LIGHTING:BUMP_SAMPLE_BEFORE(float3 outNormal)
+/// IF BUMP
+	/// IF BUMP_SHADER_FEATURE
+#HACK: the '#if defined(_NORMALMAP)' is already called in the main template, but it needs to be closed to sample the properties as they are used outside of the condition
+		#endif
+	///
+		[[SAMPLE_SHADER_PROPERTY:Normal Map]]
+	/// IF BUMP_SCALE
+		[[SAMPLE_SHADER_PROPERTY:Bump Scale]]
+	///
+	/// IF BUMP_SHADER_FEATURE
+		#if defined(_NORMALMAP)
+	///
+		normalMap = [[VALUE:Normal Map]];
+	/// IF BUMP_SCALE
+		outNormal = UnpackScaleNormal(normalMap, [[VALUE:Bump Scale]]);
+	/// ELSE
+		outNormal = UnpackNormal(normalMap);
+	///
+///
+#END
+
+#LIGHTING:UNPACK_BUMP_SURFACE(float3 outNormal, float4 normalMap, float4 outNormalTS)
 /// IF BUMP
 	/// IF BUMP_SCALE
 		outNormal = UnpackScaleNormal(normalMap, [[VALUE:Bump Scale]]);
 	/// ELSE
 		outNormal = UnpackNormal(normalMap);
 	///
+		outNormalTS = outNormal;
 ///
 #END
 
@@ -159,6 +180,6 @@ sngl	lbl="Make Optional"			kw=BUMP_SHADER_FEATURE		needs=BUMP	indent		tt="Will m
 
 #LIGHTING:APPLY_BUMP_SRP(float3 outNormal, float3 normalTS)
 /// IF BUMP
-	outNormal = mul(normalTS, tangentToWorldMatrix);
+	outNormal = normalize( mul(normalTS, tangentToWorldMatrix) );
 ///
 #END

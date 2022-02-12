@@ -1,5 +1,5 @@
 // Toony Colors Pro+Mobile 2
-// (c) 2014-2020 Jean Moreno
+// (c) 2014-2021 Jean Moreno
 
 // Shader Generator Module: Albedo HSV
 
@@ -42,7 +42,7 @@ sngl	lbl="Mask"				kw=ALBEDO_HSV_MASK		indent		needs=ALBEDO_HSV											tt="Ma
 #PROPERTIES_BLOCK
 /// IF ALBEDO_HSV
 	#if_not_empty
-		[Header(Albedo HSV)]
+		[TCP2HeaderHelp(Albedo HSV)]
 		[HideInInspector] __BeginGroup_AlbedoHSV ("Albedo HSV", Float) = 0
 	#start_not_empty_block
 		[[PROP:Albedo Hue]]

@@ -1,5 +1,5 @@
 // Toony Colors Pro+Mobile 2
-// (c) 2014-2020 Jean Moreno
+// (c) 2014-2021 Jean Moreno
 
 // Shader Generator Module: Texture Blending
 
@@ -19,6 +19,7 @@ sngl	lbl="Texture 4"					kw=BLEND_TEX4	tt="Additional texture blended based on a
 keyword	lbl="Color Channel"				kw=BLEND_TEX4_CHNL	values=R|r,G|g,B|b,A|a			needs=TEXTURE_BLENDING,BLEND_TEX4	default=3	forceKeyword=true	inline
 sngl	lbl="Normal Map Blending"		kw=TEXBLEND_BUMP				toggles=BUMP		needs=TEXTURE_BLENDING				indent		tt="Enables texture blending for the normal map"
 warning	msgType=info					needs=TRIPLANAR,TEXTURE_BLENDING		lbl="When using <b>Triplanar Mapping</b>, the <b>Texture Blending</b> feature will only affect the ground texture."
+warning	msgType=info					needs=TEXTURE_BLENDING					lbl="The <b>Material Layer</b> system introduced in version 2.7 is a system that can go beyond simple texture blending and achieve more complex layer-based effects.  Make sure to read the documentation to know if that's what you need!"
 #END
 
 //================================================================
@@ -192,7 +193,6 @@ warning	msgType=info					needs=TRIPLANAR,TEXTURE_BLENDING		lbl="When using <b>Tr
 #	/// IF TEXBLEND_NORMALIZE
 #			blendingSource.rgba = saturate(normalize(blendingSource.rgba) * dot([[VALUE:Blending Contrast]], blendingSource.rgba));
 #	///
-
 	/// IF TEXBLEND_LINEAR
 		/// IF BLEND_TEX1
 			mainTex = lerp(mainTex, tex1, blendingSource.@%BLEND_TEX1_CHNL%@);
@@ -239,7 +239,7 @@ warning	msgType=info					needs=TRIPLANAR,TEXTURE_BLENDING		lbl="When using <b>Tr
 #END
 
 #FRAGMENT:BUMP(float4 normalMap)
-/// IF TEXTURE_BLENDING && TEXBLEND_BUMP
+/// IF TEXTURE_BLENDING && TEXBLEND_BUMP && BUMP
 
 		// Texture Blending: normal maps
   /// IF BLEND_TEX1

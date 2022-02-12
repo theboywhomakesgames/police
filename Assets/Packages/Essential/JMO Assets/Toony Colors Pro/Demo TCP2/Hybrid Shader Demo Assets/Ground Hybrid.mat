@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Ground Hybrid
   m_Shader: {fileID: 4800000, guid: 7ffc1bc2bbb1ef64f84b552b2d2f0619, type: 3}
-  m_ShaderKeywords: TCP2_UV_NORMALS_FULL
+  m_ShaderKeywords: TCP2_SHADOW_LIGHT_ATTEN_COLOR TCP2_SHADOW_LIGHT_COLOR TCP2_UV_NORMALS_FULL
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -83,6 +83,8 @@ Material:
     - _OutlineTextureLOD: 5
     - _OutlineTextureType: 0
     - _OutlineWidth: 1
+    - _RampBands: 4
+    - _RampBandsSmoothing: 0.1
     - _RampOffset: 0
     - _RampScale: 1
     - _RampSmoothing: 0.1
@@ -94,6 +96,8 @@ Material:
     - _RenderingMode: 0
     - _RimMax: 1
     - _RimMin: 0.5
+    - _ShadowColorLightAtten: 1
+    - _ShadowColorMode: 2
     - _SingleIndirectColor: 0
     - _SpecularMapType: 0
     - _SpecularRoughness: 0.5
@@ -106,6 +110,7 @@ Material:
     - _UseFresnelReflections: 1
     - _UseMatCap: 0
     - _UseMatCapMask: 0
+    - _UseMobileMode: 0
     - _UseNormalMap: 0
     - _UseOcclusion: 0
     - _UseOutline: 0
@@ -123,5 +128,5 @@ Material:
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _ReflectionColor: {r: 1, g: 1, b: 1, a: 1}
     - _RimColor: {r: 0.8, g: 0.8, b: 0.8, a: 0.5}
-    - _SColor: {r: 0.9150943, g: 0.3592982, b: 0, a: 1}
+    - _SColor: {r: 0.85300004, g: 0.577999, b: 0.40005705, a: 1}
     - _SpecularColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}

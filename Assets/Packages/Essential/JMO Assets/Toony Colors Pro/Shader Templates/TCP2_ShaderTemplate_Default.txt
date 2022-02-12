@@ -1,5 +1,5 @@
 // Toony Colors Pro+Mobile 2
-// (c) 2014-2020 Jean Moreno
+// (c) 2014-2021 Jean Moreno
 #NAME=Default
 #FEATURES
 dd_start	lbl=LIGHTING
@@ -1092,10 +1092,6 @@ Shader "@%SHADER_NAME%@"
 			UNITY_SETUP_INSTANCE_ID(v);
 			UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
-	#if UNITY_VERSION >= 550
-			//GPU instancing support
-			UNITY_SETUP_INSTANCE_ID(v);
-	#endif
 	/// IF VERTEXMOTION
 
 			//VertExmotion

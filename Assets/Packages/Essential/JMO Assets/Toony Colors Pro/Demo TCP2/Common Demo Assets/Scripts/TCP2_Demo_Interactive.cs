@@ -13,6 +13,7 @@ namespace ToonyColorsPro
 			public TCP2_Demo_Camera demoCamera;
 			new public Camera camera;
 			public Canvas canvas;
+			public CanvasScaler canvasScaler;
 			[Space]
 			public HorizontalLayoutGroup layoutGroup;
 			public ContentSizeFitter sizeFitter;
@@ -204,7 +205,10 @@ namespace ToonyColorsPro
 				r.z = angle;
 				line.rectTransform.localEulerAngles = r;
 
+				// Need to find canvas ratio according to resolution for proper distance calculation
+				float ratio = canvasScaler.referenceResolution.x / Screen.width;
 				float dist = Vector2.Distance(start, end) * lengthPercentage;
+				dist *= ratio;
 				var sd = line.rectTransform.sizeDelta;
 				sd.y = dist;
 				line.rectTransform.sizeDelta = sd;

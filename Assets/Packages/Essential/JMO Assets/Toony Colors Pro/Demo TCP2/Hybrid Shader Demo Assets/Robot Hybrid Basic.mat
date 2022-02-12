@@ -9,7 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Robot Hybrid Basic
   m_Shader: {fileID: 4800000, guid: 7ffc1bc2bbb1ef64f84b552b2d2f0619, type: 3}
-  m_ShaderKeywords: TCP2_OUTLINE_MIN_SIZE TCP2_TANGENT_AS_NORMALS TCP2_UV_NORMALS_FULL
+  m_ShaderKeywords: TCP2_OUTLINE_MIN_SIZE TCP2_SHADOW_LIGHT_COLOR TCP2_TANGENT_AS_NORMALS
+    TCP2_UV_NORMALS_FULL
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -114,6 +115,8 @@ Material:
     - _OutlineTextureType: 0
     - _OutlineWidth: 0.3
     - _Parallax: 0.02
+    - _RampBands: 4
+    - _RampBandsSmoothing: 0.1
     - _RampOffset: 0
     - _RampScale: 1
     - _RampSmoothing: 0.1
@@ -125,6 +128,7 @@ Material:
     - _RenderingMode: 0
     - _RimMax: 1
     - _RimMin: 0.5
+    - _ShadowColorLightAtten: 1
     - _SingleIndirectColor: 0
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -140,6 +144,7 @@ Material:
     - _UseFresnelReflections: 0
     - _UseMatCap: 0
     - _UseMatCapMask: 0
+    - _UseMobileMode: 0
     - _UseNormalMap: 0
     - _UseOcclusion: 0
     - _UseOutline: 0
