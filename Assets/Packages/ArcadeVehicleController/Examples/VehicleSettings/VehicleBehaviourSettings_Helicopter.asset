@@ -23,10 +23,11 @@ MonoBehaviour:
   drift: 0
   vehicleBodyTilt: 3
   forwardTilt: 10
+  angularDrag: -1
   turnInAir: 1
   turnWhenStationary: 1
   twoWheelTilt: 1
   stopSlopeSlide: 1
   groundMask:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 64

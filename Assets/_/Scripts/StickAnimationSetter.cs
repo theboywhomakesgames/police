@@ -44,7 +44,6 @@ namespace DB.Police
                 // set speed and check walking
                 Vector3 noYVel = new Vector3(rb.velocity.x, 0, rb.velocity.z);
                 float velMag = noYVel.magnitude;
-                print(velMag);
                 float animationSpeed = 1;
 
                 if(velMag < maxWalkSpeed){

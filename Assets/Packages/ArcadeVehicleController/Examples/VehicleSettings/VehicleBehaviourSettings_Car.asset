@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11b0d68efdcb67b49b5e649862afff07, type: 3}
   m_Name: VehicleBehaviourSettings_Car
   m_EditorClassIdentifier: 
-  acceleration: 12
+  acceleration: 7
   maxSpeed: 30
   breakSpeed: 1.7
   boostSpeed: 60
@@ -22,11 +22,12 @@ MonoBehaviour:
   gravity: 20
   drift: 0.85
   vehicleBodyTilt: 0
-  forwardTilt: 4
-  turnInAir: 1
+  forwardTilt: 10
+  angularDrag: -2
+  turnInAir: 0
   turnWhenStationary: 1
   twoWheelTilt: 0
   stopSlopeSlide: 1
   groundMask:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 64
