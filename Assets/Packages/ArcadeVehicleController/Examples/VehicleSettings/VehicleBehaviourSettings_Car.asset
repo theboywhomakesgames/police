@@ -12,15 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11b0d68efdcb67b49b5e649862afff07, type: 3}
   m_Name: VehicleBehaviourSettings_Car
   m_EditorClassIdentifier: 
-  acceleration: 7
+  acceleration: 5
   maxSpeed: 30
-  breakSpeed: 1.7
+  breakSpeed: 15
   boostSpeed: 60
   maxSpeedToStartReverse: 150
-  steering: 80
+  steering: 100
   maxStrafingSpeed: 15
   gravity: 20
-  drift: 0.85
+  drift: 0.4
   vehicleBodyTilt: 0
   forwardTilt: 10
   angularDrag: -2
@@ -30,4 +30,4 @@ MonoBehaviour:
   stopSlopeSlide: 1
   groundMask:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 2039

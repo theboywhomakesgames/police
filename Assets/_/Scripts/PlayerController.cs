@@ -11,6 +11,8 @@ namespace DB.Police
     {
         public UnityEvent<PlayerReference> OnTap;
         public UnityEvent OnCarModeActivation, OnCarModeDeactivation;
+        public BoolCondition isMovingCondition;
+        public V3Var inputVector;
 
         public void ActivateCarMode(VehicleController vc)
         {
@@ -29,8 +31,6 @@ namespace DB.Police
 
         [SerializeField] private Transform playerT;
         [SerializeField] private TouchStick joystick;
-        [SerializeField] private BoolCondition isMovingCondition;
-        [SerializeField] private V3Var inputVector;
         [SerializeField] private float tapTime = 0.1f;
         [SerializeField] private PlayerReference pr;
 
@@ -92,7 +92,7 @@ namespace DB.Police
         }
 
         private void OnInput(Vector3 input){
-            inputVector.value = -(input / Screen.width);
+            inputVector.UpdateValue(-(input / Screen.width));
         }
     }
 }
