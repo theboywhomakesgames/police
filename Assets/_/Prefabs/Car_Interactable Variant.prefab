@@ -1,0 +1,319 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &6458228366945894021
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 611994947155249509, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_Height
+      value: 1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1555079387189267117, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_Height
+      value: 1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 2505039868941315682, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: decay
+      value: 0.95
+      objectReference: {fileID: 0}
+    - target: {fileID: 2505039868941315682, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: drift
+      value: 0.94
+      objectReference: {fileID: 0}
+    - target: {fileID: 3011375968144045249, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.113
+      objectReference: {fileID: 0}
+    - target: {fileID: 3011375968144045249, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3011375968144045249, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.038
+      objectReference: {fileID: 0}
+    - target: {fileID: 4105122717460159721, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4105122717460159721, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.038
+      objectReference: {fileID: 0}
+    - target: {fileID: 4722673780411880901, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_Name
+      value: Car_Interactable
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550440853217277229, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550440853217277229, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 61.36
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550440853217277229, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.771
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550440853217277229, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -16.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550440853217277229, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.70663416
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550440853217277229, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.000000009002627
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550440853217277229, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.70757914
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550440853217277229, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 4.903247e-10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550440853217277229, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550440853217277229, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -269.923
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550440853217277229, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6750703786190589864, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6750703786190589864, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.038
+      objectReference: {fileID: 0}
+    - target: {fileID: 6837766333273334498, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: Feedbacks.Array.data[0]
+      value: 
+      objectReference: {fileID: 722976920}
+    - target: {fileID: 6837766333273334498, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: Feedbacks.Array.data[1]
+      value: 
+      objectReference: {fileID: 722976918}
+    - target: {fileID: 7788657735749317742, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_Height
+      value: 1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 7822909045681921102, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: vehicleVCam
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8681497620540161723, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+        type: 3}
+      propertyPath: m_Drag
+      value: 5
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 5458912135527560023, guid: 332bbbe3b47ba4a4f85e77a551f2fa56, type: 3}
+    - {fileID: 8084468254476505712, guid: 332bbbe3b47ba4a4f85e77a551f2fa56, type: 3}
+  m_SourcePrefab: {fileID: 100100000, guid: 332bbbe3b47ba4a4f85e77a551f2fa56, type: 3}
+--- !u!1 &6794860147092039737 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 570845778881812156, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
+    type: 3}
+  m_PrefabInstance: {fileID: 6458228366945894021}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &722976918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6794860147092039737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f1326a5f4dbb874f9c42effa0befa36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Active: 1
+  Label: Haptics
+  Chance: 100
+  Timing:
+    TimescaleMode: 0
+    InitialDelay: 0
+    CooldownDuration: 0
+    ExcludeFromHoldingPauses: 0
+    InterruptsOnStop: 1
+    NumberOfRepeats: 0
+    RepeatForever: 0
+    DelayBetweenRepeats: 1
+    MMFeedbacksDirectionCondition: 0
+    PlayDirection: 0
+    ConstantIntensity: 0
+    UseIntensityInterval: 0
+    IntensityIntervalMin: 0
+    IntensityIntervalMax: 0
+    Sequence: {fileID: 0}
+    TrackID: 0
+    Quantized: 0
+    TargetBPM: 120
+  DebugActive: 0
+  HapticMethod: 0
+  HapticType: 4
+  TransientIntensity: 1
+  TransientSharpness: 1
+  ATVibrateIOS: 1
+  ATIOSIntensity: 1
+  ATIOSSharpness: 1
+  ATVibrateAndroid: 1
+  ATVibrateAndroidIfNoSupport: 0
+  ATAndroidIntensity: 1
+  ATAndroidSharpness: 1
+  ATRumble: 1
+  ATRumbleIntensity: 1
+  ATRumbleSharpness: 1
+  ATRumbleControllerID: -1
+  InitialContinuousIntensity: 1
+  ContinuousIntensityCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  InitialContinuousSharpness: 1
+  ContinuousSharpnessCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  ContinuousDuration: 1
+  APVibrateIOS: 1
+  AHAPFileForIOS: {fileID: 0}
+  APVibrateAndroid: 1
+  APVibrateAndroidIfNoSupport: 0
+  AndroidWaveFormFile: {fileID: 0}
+  APRumble: 1
+  RumbleWaveFormFile: {fileID: 0}
+  AndroidRepeat: -1
+  RumbleRepeat: -1
+  OldIOSFallback: 0
+  Timescale: 1
+  AllowRumble: 1
+  ControllerID: -1
+--- !u!114 &722976920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6794860147092039737}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c2ce51367856bd49b72678cc4263225, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Active: 1
+  Label: Sound
+  Chance: 100
+  Timing:
+    TimescaleMode: 0
+    InitialDelay: 0
+    CooldownDuration: 0
+    ExcludeFromHoldingPauses: 0
+    InterruptsOnStop: 1
+    NumberOfRepeats: 0
+    RepeatForever: 0
+    DelayBetweenRepeats: 1
+    MMFeedbacksDirectionCondition: 0
+    PlayDirection: 0
+    ConstantIntensity: 0
+    UseIntensityInterval: 0
+    IntensityIntervalMin: 0
+    IntensityIntervalMax: 0
+    Sequence: {fileID: 0}
+    TrackID: 0
+    Quantized: 0
+    TargetBPM: 120
+  DebugActive: 0
+  Sfx: {fileID: 8300000, guid: 64fb9477894fa2e4a997518fbb1c2f15, type: 3}
+  RandomSfx: []
+  TestButton: 0
+  TestStopButton: 0
+  PlayMethod: 3
+  PoolSize: 3
+  MinVolume: 0.5
+  MaxVolume: 0.8
+  MinPitch: 1
+  MaxPitch: 3
+  SfxAudioMixerGroup: {fileID: 0}
