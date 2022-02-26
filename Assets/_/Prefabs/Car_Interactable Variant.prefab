@@ -55,7 +55,7 @@ PrefabInstance:
     - target: {fileID: 4722673780411880901, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
         type: 3}
       propertyPath: m_Name
-      value: Car_Interactable
+      value: Car_Interactable Variant
       objectReference: {fileID: 0}
     - target: {fileID: 5550440853217277229, guid: 332bbbe3b47ba4a4f85e77a551f2fa56,
         type: 3}

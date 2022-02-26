@@ -10,6 +10,17 @@ namespace DB.Police{
     {
         public Transform vehicleT;
 
+        public void OnCarCollision(Collision c){
+            GameObject particleGO = particlePool.GetInstance();
+            particleGO.SetActive(true);
+            particleGO.transform.position = c.GetContact(0).point;
+            particleGO.GetComponent<ParticleSystem>().Play();
+
+            TimeManager.Instance.DoWithDelay(1, () => {
+                particlePool.ReturnInstance(particleGO);
+            });
+        }
+
         public void ApplyInput(Vector3 input, float accScale)
         {
             gotInput = true;
@@ -20,6 +31,10 @@ namespace DB.Police{
                 supposedForward,
                 Time.deltaTime * torque
             );
+
+            float dirDot = -Vector3.Dot(vehicleT.forward, curVelocity.normalized);
+            bool emit = dirDot < trailThreshold;
+            ActivateTrail(emit);
 
             curVelocity -= vehicleT.forward * acceleration * Time.deltaTime * accScale;
             if(curVelocity.magnitude > speed)
@@ -49,8 +64,19 @@ namespace DB.Police{
         [FoldoutGroup("Physics")]
         [SerializeField] private Rigidbody rb;
 
+        [SerializeField] private float trailThreshold = 0.5f;
+        [SerializeField] private TrailRenderer[] trails;
+
+        [SerializeField] private ParticlePool particlePool;
+
         private Vector3 supposedForward, curVelocity;
         private bool gotInput = false;
+
+        private void ActivateTrail(bool e){
+            foreach(TrailRenderer tr in trails){
+                tr.emitting = e;
+            }
+        }
 
         private void Update(){
             if(gotInput){
