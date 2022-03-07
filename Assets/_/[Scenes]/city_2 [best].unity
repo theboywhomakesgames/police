@@ -7834,6 +7834,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91a5a097efc13dc4c8082e196e6c273c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnActivation:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDeactivation:
+    m_PersistentCalls:
+      m_Calls: []
   floors:
   - cams:
     - {fileID: 830566344}
@@ -7859,6 +7865,7 @@ MonoBehaviour:
     idx: 0
   junk: {fileID: 2056370371}
   idx: 0
+  mainCam: {fileID: 0}
 --- !u!4 &453830676
 Transform:
   m_ObjectHideFlags: 0
@@ -8351,7 +8358,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &512320900
 Transform:
   m_ObjectHideFlags: 0

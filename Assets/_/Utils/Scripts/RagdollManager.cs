@@ -3,20 +3,29 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace DB.Utils
 {
     public class RagdollManager : MonoBehaviour
     {
         public Transform root;
+        public UnityEvent OnActivation;
+
         [SerializeField] private bool _isActive = false;
         [SerializeField] private Collider _selfCollider;
-        [SerializeField] private Rigidbody _mainRB;
+        [SerializeField] private Rigidbody _mainRB, hipsRB;
         [SerializeField] private SkinnedMeshRenderer _mesh;
         [SerializeField] private Component[] _destroyOnActivation;
 
         private Rigidbody[] _rbs;
         private Collider[] _colliders;
+
+        public void Activate(Vector3 dir, float speed)
+        {
+            hipsRB.velocity = dir * speed;
+            Activate();
+        }
 
         [Button("Activate")]
         public void Activate(float damper = 0f)
@@ -26,10 +35,12 @@ namespace DB.Utils
                 Destroy(c);
             }
 
-            transform.parent = null;
+            //transform.parent = null;
             //_mesh.transform.parent = null;
+            _selfCollider.enabled = false;
             _isActive = true;
             SetActivation(damper);
+            OnActivation?.Invoke();
         }
 
         [Button("Deactivate")]
