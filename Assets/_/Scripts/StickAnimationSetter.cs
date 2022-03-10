@@ -7,7 +7,7 @@ using Sirenix.OdinInspector;
 
 namespace DB.Police
 {
-    public class StickAnimationSetter : MonoBehaviour
+    public class StickAnimationSetter : AnimationPlayer
     {
         public void OnStartMovement(){
             isMoving = true;
@@ -18,7 +18,6 @@ namespace DB.Police
         }
 
         [SerializeField] private BoolCondition isMovingCondition;
-        [SerializeField] private Animator animator;
 
         [FoldoutGroup("Physical")]
         [SerializeField] private Rigidbody rb;

@@ -9,12 +9,24 @@ namespace DB.Police
 {
     public class GoalChaser : MonoBehaviour
     {
+        public void Activate()
+        {
+            isActive = true;
+        }
+
+        public void Deactivate()
+        {
+            isActive = true;
+        }
+
         public Transform goalT;
         public event Action OnArrival;
 
         [SerializeField] private V3Var inputVector;
         [SerializeField] private float threshold = 0.2f;
         [SerializeField] private BoolCondition isMovingCondition;
+
+        bool isActive = true;
 
         private void Awake()
         {
@@ -23,25 +35,32 @@ namespace DB.Police
 
         private void Update()
         {
-            Vector3 i = goalT.position - transform.position;
-            i.y = i.z;
-            i.z = 0;
+            if (isActive)
+            {
+                Vector3 i = goalT.position - transform.position;
+                i.y = i.z;
+                i.z = 0;
 
-            if(i.magnitude > threshold)
-            {
-                if(!isMovingCondition.value)
-                    isMovingCondition.Activate();
-            }
-            else
-            {
-                if (isMovingCondition.value)
+                if (i.magnitude > threshold)
                 {
-                    OnArrival?.Invoke();
-                    isMovingCondition.Deactivate();
+                    if (!isMovingCondition.value)
+                        isMovingCondition.Activate();
                 }
-            }
+                else
+                {
+                    if (isMovingCondition.value)
+                    {
+                        OnArrival?.Invoke();
+                        isMovingCondition.Deactivate();
+                    }
+                }
 
-            inputVector.value = i.normalized;
+                inputVector.value = i.normalized;
+            }
+            else if (isMovingCondition.value)
+            {
+                isMovingCondition.Deactivate();
+            }
         }
     }
 }
