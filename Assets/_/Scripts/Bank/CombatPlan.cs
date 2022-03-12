@@ -4,6 +4,7 @@ using UnityEngine;
 using DG.Tweening;
 using Sirenix.OdinInspector;
 using System;
+using UnityEngine.Events;
 
 namespace DB.Police
 {
@@ -21,9 +22,13 @@ namespace DB.Police
     [Serializable]
     public class CombatState
     {
+        public UnityEvent OnPhaseStart;
         public AnimationState animationState;
         public CharacterPlacor destinationPlacor;
-        public CombatTarget[] targets;
+        public Transform[] path;
+        public CombatTarget target;
+
+        public int pathidx = 0;
     }
 
     public class CombatPlan : MonoBehaviour
@@ -32,21 +37,58 @@ namespace DB.Police
         public void GoToNext()
         {
             animationPlayer.PlayAnimation("Idle");
-            chaser.Activate();
-            chaser.goalT.position = states[index].destinationPlacor.transform.position;
+
+            states[index].OnPhaseStart?.Invoke();
             states[index].destinationPlacor.OnActivation += OnStartPlacing;
             states[index].destinationPlacor.OnDonePlacing += OnPlaced;
+
+            isWalkingPath = true;
+            chaser.OnArrival += GotoNextPathLoc;
+            GotoNextPathLoc();
+        }
+
+        public void GotoNextPathLoc()
+        {
+            if (!isWalkingPath || states[index].pathidx >= states[index].path.Length)
+                return;
+
+            chaser.Activate();
+            chaser.goalT.position = states[index].path[states[index].pathidx].position;
+            states[index].pathidx++;
         }
 
         public void EnterCombatMode()
         {
+            states[index].target.Activate();
+            manager.SetTarget(states[index].target.selfTargetT);
+            states[index].target.OnDeathE += ExitCombatMode;
+        }
 
+        public void ExitCombatMode()
+        {
+            chaser.Activate();
+            states[index].destinationPlacor.Release();
+            states[index].target.OnDeathE -= ExitCombatMode;
+
+            index++;
+            if (index >= states.Length)
+            {
+                // end combat
+
+            }
+            else
+            {
+                animationPlayer.PlayAnimation("Idle");
+                GoToNext();
+            }
         }
 
         [SerializeField] private AnimationPlayer animationPlayer;
         [SerializeField] private CombatState[] states;
         [SerializeField] private int index;
         [SerializeField] private GoalChaser chaser;
+        [SerializeField] private CombatManager manager;
+        [SerializeField] private bool isWalkingPath = false;
 
         private void Start()
         {
@@ -81,17 +123,13 @@ namespace DB.Police
             );
 
             chaser.Deactivate();
-
-            index++;
-            if (index >= states.Length)
-            {
-
-            }
+            EnterCombatMode();
         }
 
         private void OnStartPlacing()
         {
-            print("placing");
+            isWalkingPath = false;
+            chaser.OnArrival -= GotoNextPathLoc;
         }
     }
 }

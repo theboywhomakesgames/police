@@ -33,6 +33,11 @@ namespace DB.Police
             animationPlayer.PlayAnimation("ShootLeftGoBack");
         }
 
+        public void SetTarget(Transform target)
+        {
+            this.target = target;
+        }
+
         [SerializeField] private bool isMouseDown, isActive, isShooting;
         [SerializeField] private AnimationPlayer animationPlayer;
         [SerializeField] private Gun gun;

@@ -12,15 +12,26 @@ namespace DB.Police
         public UnityEvent OnEnter;
         public event Action OnActivation, OnDonePlacing;
 
+        public void Release()
+        {
+            rb.isKinematic = false;
+        }
+
         public void Place(Collider other)
         {
+            if (isUsed)
+                return;
+
             OnEnter?.Invoke();
             OnActivation?.Invoke();
 
-            other.GetComponent<Rigidbody>().isKinematic = true;
+            rb = other.attachedRigidbody;
+            if (rb == null)
+                return;
+
+            rb.isKinematic = true;
             other.transform.DOMove(placeT.position, placingTime).OnComplete(() =>
             {
-                other.GetComponent<Rigidbody>().isKinematic = false;
                 OnDonePlacing?.Invoke();
 
                 foreach (Delegate d in OnDonePlacing.GetInvocationList())
@@ -29,9 +40,19 @@ namespace DB.Police
                 }
             });
             other.transform.DORotateQuaternion(placeT.rotation, placingTime);
+            Use();
         }
+
+        public void Use()
+        {
+            isUsed = true;
+        }
+
+        private bool isUsed = false;
 
         [SerializeField] private Transform placeT;
         [SerializeField] private float placingTime = 1f;
+
+        Rigidbody rb;
     }
 }

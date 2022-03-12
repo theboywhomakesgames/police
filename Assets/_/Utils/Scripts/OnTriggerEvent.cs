@@ -9,6 +9,7 @@ namespace DB.Utils
     {
         public LayerMask layerMask;
         public UnityEvent<Collider> OnEnter, OnExit, OnStay;
+        public bool killOther = false;
 
         private void OnTriggerEnter(Collider other)
         {
@@ -16,6 +17,10 @@ namespace DB.Utils
             if (layerTest > 0)
             {
                 OnEnter?.Invoke(other);
+                if (killOther)
+                {
+                    Destroy(other.gameObject);
+                }
             }
         }
 
