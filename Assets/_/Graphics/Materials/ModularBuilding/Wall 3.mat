@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Wall 1
+  m_Name: Wall 3
   m_Shader: {fileID: 4800000, guid: 7ffc1bc2bbb1ef64f84b552b2d2f0619, type: 3}
   m_ShaderKeywords: TCP2_MOBILE TCP2_REFLECTIONS_FRESNEL TCP2_RIM_LIGHTING_LIGHTMASK
     TCP2_SHADOW_LIGHT_COLOR TCP2_UV_NORMALS_FULL _CELPRIMARYMODE_SINGLE _TEXTUREBLENDINGMODE_MULTIPLY
@@ -237,7 +237,7 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - _BaseColor: {r: 0.21542363, g: 0.6749322, b: 0.9716981, a: 1}
+    - _BaseColor: {r: 1, g: 0.7119984, b: 0.2783019, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _ColorDim: {r: 0.4716981, g: 0.12237452, b: 0.36612043, a: 1}
     - _ColorDimCurve: {r: 0.85023, g: 0.85034, b: 0.8504499, a: 0.85056}
