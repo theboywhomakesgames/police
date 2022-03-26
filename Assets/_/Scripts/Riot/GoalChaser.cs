@@ -19,12 +19,26 @@ namespace DB.Police
             isActive = true;
         }
 
+        public void SetGoal(Vector3 pos)
+        {
+            if (randomizeGoal)
+            {
+                pos += new Vector3(
+                    UnityEngine.Random.Range(-1f, 1f),
+                    0,
+                    UnityEngine.Random.Range(-1f, 1f)
+                ).normalized;
+            }
+            goalT.position = pos;
+        }
+
         public Transform goalT;
         public event Action OnArrival;
 
         [SerializeField] private V3Var inputVector;
         [SerializeField] private float threshold = 0.2f;
         [SerializeField] private BoolCondition isMovingCondition;
+        [SerializeField] private bool randomizeGoal;
 
         bool isActive = true;
 
